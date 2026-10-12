@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { hasAccesoTotal } from "@/lib/access";
+import { getPriceId } from "@/lib/stripe";
 
 export default async function Cuenta({ searchParams }: { searchParams: Promise<{ pago?: string }> }) {
   const supabase = await createClient();
@@ -17,7 +18,8 @@ export default async function Cuenta({ searchParams }: { searchParams: Promise<{
     .eq("user_id", user.id)
     .maybeSingle();
 
-  const plan = sub?.price_id === process.env.STRIPE_PRICE_YEARLY ? "Anual ($999 MXN)" : "Mensual ($99 MXN)";
+  const yearly = subscribed ? await getPriceId("anual").catch(() => null) : null;
+  const plan = sub?.price_id && sub.price_id === yearly ? "Anual ($999 MXN)" : "Mensual ($99 MXN)";
   const until = sub?.current_period_end
     ? new Date(sub.current_period_end).toLocaleDateString("es-MX", { dateStyle: "long" })
     : null;

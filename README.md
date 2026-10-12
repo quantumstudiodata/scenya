@@ -15,7 +15,7 @@ Plataforma web de miniseries. Next.js + Supabase (usuarios y catálogo) + Stripe
 
 ### 2. Stripe (modo prueba)
 1. **Productos → Crear producto** "Acceso Total" con dos precios recurrentes:
-   $99 MXN mensual y $999 MXN anual. Copia los dos IDs `price_...`.
+   $99 MXN mensual y $999 MXN anual (un producto por plan). Copia los dos IDs `prod_...`.
 2. **Developers → Webhooks → Add endpoint**: `https://scenya.vercel.app/api/webhook` con los eventos
    `checkout.session.completed`, `customer.subscription.created`,
    `customer.subscription.updated`, `customer.subscription.deleted`. Copia el *Signing secret* (`whsec_...`).

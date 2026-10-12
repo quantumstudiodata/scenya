@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { stripe, PLANS, type PlanKey } from "@/lib/stripe";
+import { stripe, PLANS, getPriceId, type PlanKey } from "@/lib/stripe";
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
       mode: "subscription",
       customer: customerId,
       client_reference_id: user.id,
-      line_items: [{ price: PLANS[plan].priceId, quantity: 1 }],
+      line_items: [{ price: await getPriceId(plan), quantity: 1 }],
       subscription_data: { metadata: { user_id: user.id } },
       locale: "es",
       success_url: `${site}/cuenta?pago=ok`,
