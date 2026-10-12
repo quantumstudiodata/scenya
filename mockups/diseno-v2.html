@@ -318,6 +318,83 @@ svg.fill{fill:currentColor;stroke:none}
 .toast.on{opacity:1;transform:translate(-50%,0)}
 
 .note{margin:36px auto 0;max-width:780px;color:var(--lav-dim);font-size:13px;text-align:center}
+/* --- Escritorio --- */
+.dscroll{overflow-x:auto;padding-bottom:8px}
+.dwin{min-width:920px;border-radius:14px;overflow:hidden;border:1px solid var(--line);box-shadow:0 30px 70px rgba(0,0,0,.5);background:var(--ink);margin-bottom:12px}
+.dbar{height:30px;background:#05001f;display:flex;align-items:center;gap:6px;padding:0 12px;font-size:11px;color:var(--lav-dim)}
+.dbar i{width:10px;height:10px;border-radius:50%;background:#2a2360}
+.dbar span{margin-left:14px;background:var(--ink-2);border-radius:6px;padding:2px 12px}
+.dcap{display:flex;gap:12px;align-items:baseline;margin:34px 0 12px;flex-wrap:wrap}
+.dcap h3{font-size:19px}
+.dcap p{color:var(--lav-dim);font-size:13px;max-width:70ch}
+.dnav{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;gap:26px;padding:18px 36px;z-index:3;font-size:13px;background:linear-gradient(rgba(8,1,48,.7),transparent)}
+.dnav .lg{font:800 20px var(--display)}
+.dnav .lg span{color:var(--cyan)}
+.dnav nav{display:flex;gap:20px;color:var(--lav-dim)}
+.dnav nav b{color:var(--lav)}
+.dnav .sp{flex:1}
+.dnav .srch{width:200px;border-radius:99px;background:rgba(236,233,255,.1);padding:6px 14px;color:var(--lav-dim);font-size:12px}
+.dhero{height:430px;position:relative;display:flex;flex-direction:column;justify-content:flex-end;padding:0 36px 40px}
+.dhero::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(8,1,48,.92) 0%,rgba(8,1,48,.55) 40%,transparent 70%),linear-gradient(transparent 60%,var(--ink))}
+.dhero>*{position:relative;z-index:1;max-width:460px}
+.dhero h2{font-size:52px;line-height:.95;letter-spacing:-2px;margin:10px 0 12px}
+.dhero p{color:var(--lav-dim);font-size:14px;margin-bottom:18px}
+.dhero .art{position:absolute;right:80px;top:70px;bottom:60px;width:230px;max-width:none;border-radius:18px;z-index:1;box-shadow:0 30px 60px rgba(0,0,0,.5)}
+.drow{padding:4px 36px 0}
+.drow h4{font-size:17px;margin:20px 0 12px}
+.dcont{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.dcont .po{aspect-ratio:16/9;border-radius:12px}
+.dtop{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding-bottom:30px}
+.dtop .t10 em{font-size:96px;-webkit-text-stroke:2px var(--violet);margin-right:-14px}
+.dtop .t10 .po{width:100px}
+
+.dserie{position:relative;height:400px;display:flex;align-items:flex-end;gap:28px;padding:0 36px 32px;overflow:hidden}
+.dserie .blur{position:absolute;inset:-40px;filter:blur(30px) saturate(1.2);opacity:.75}
+.dserie::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 20%,var(--ink))}
+.dserie>*:not(.blur){position:relative;z-index:1}
+.dserie .po{width:200px;aspect-ratio:3/4;flex:none;box-shadow:0 30px 60px rgba(0,0,0,.5);border-radius:16px}
+.dserie .po .sb-play{top:50%}
+.dserie h2{font-size:46px;line-height:1;letter-spacing:-1.5px;margin:8px 0}
+.dserie .facts{margin:6px 0 16px}
+.dcols{display:grid;grid-template-columns:1.4fr 1fr;gap:36px;padding:8px 36px 34px}
+.dcols h4{font-size:16px;margin:14px 0 10px}
+.drev{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.drec{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+
+.dplay{position:relative;height:560px;display:grid;grid-template-columns:1fr 320px;overflow:hidden;background:#04001a}
+.dstage{position:relative;display:flex;justify-content:center;align-items:center;gap:18px;overflow:hidden}
+.dstage .bgblur{position:absolute;inset:-60px;filter:blur(50px);opacity:.45}
+.dvid{position:relative;height:510px;aspect-ratio:9/16;border-radius:16px;overflow:hidden;z-index:1;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.dvid .shade{position:absolute;inset:0;background:linear-gradient(transparent 55%,rgba(8,1,48,.9))}
+.dvid .sub{position:absolute;left:16px;right:16px;top:55%;text-align:center;font:600 15px/1.35 var(--display);text-shadow:0 2px 10px rgba(0,0,0,.8)}
+.dvid .info{position:absolute;left:14px;right:14px;bottom:18px;font-size:12px}
+.dvid .info b{font:700 15px var(--display);display:block}
+.dvid .info span{color:var(--lav-dim)}
+.dvid .pbar{bottom:0}
+.drail{position:relative;z-index:1;display:grid;gap:16px;align-self:flex-end;margin-bottom:40px}
+.drail .rail{position:static}
+.dupdown{position:absolute;right:20px;top:50%;transform:translateY(-50%);display:grid;gap:10px;z-index:1}
+.dupdown span{width:40px;height:40px;border-radius:50%;background:rgba(236,233,255,.1);display:grid;place-items:center}
+.dupdown svg{width:18px;height:18px}
+.dback{position:absolute;top:16px;left:20px;z-index:2;display:flex;align-items:center;gap:10px;font-size:13px}
+.dback .back{position:static}
+.dside{background:var(--ink-2);border-left:1px solid var(--line);display:flex;flex-direction:column;min-width:0}
+.dside .dtabs{display:flex;border-bottom:1px solid var(--line);font-size:13px}
+.dside .dtabs button{flex:1;padding:12px 0;color:var(--lav-dim)}
+.dside .dtabs button.on{color:var(--lav);font-weight:600;box-shadow:inset 0 -2px 0 var(--cyan)}
+.dside .dbody{padding:14px 16px;overflow-y:auto;flex:1;scrollbar-width:none}
+.dside .epg{grid-template-columns:repeat(6,1fr)}
+.dside .cinput{padding:10px 0 0;border:0}
+.dover{position:absolute;inset:0;background:rgba(4,0,24,.6);z-index:5;display:none;place-items:center}
+.dover.on{display:grid}
+.dover .modal{position:relative;left:auto;right:auto;top:auto;transform:none;width:380px;opacity:1;pointer-events:auto}
+.dstates{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.dstates button{border:1px solid var(--line);border-radius:99px;padding:7px 14px;font-size:13px;background:var(--ink-2)}
+.dstates button[aria-pressed="true"]{background:var(--lav);color:var(--ink);border-color:transparent}
+.dtable{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:12px;margin-top:22px}
+.dtable div{background:var(--ink-2);border:1px solid var(--line);border-radius:16px;padding:14px 16px;font-size:13px;color:var(--lav-dim)}
+.dtable b{display:block;color:var(--lav);font-family:var(--display);margin-bottom:4px}
+
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -328,6 +405,7 @@ svg.fill{fill:currentColor;stroke:none}
       <button role="tab" aria-selected="true" data-tab="inicio">Inicio · 3 opciones</button>
       <button role="tab" aria-selected="false" data-tab="serie">Serie · 3 opciones</button>
       <button role="tab" aria-selected="false" data-tab="player">Reproductor</button>
+      <button role="tab" aria-selected="false" data-tab="desk">Escritorio</button>
     </div>
   </div>
 
@@ -633,6 +711,160 @@ svg.fill{fill:currentColor;stroke:none}
     </div>
   </section>
 
+  <!-- ============ ESCRITORIO ============ -->
+  <section id="desk" role="tabpanel" hidden>
+    <p class="intro"><b>Las mismas pantallas en computadora</b>, con Inicio B · Cine y Serie B · Póster grande. El video sigue siendo vertical y ocupa el centro; lo que en el teléfono se abre desde abajo, en escritorio vive en un panel lateral o en una ventana al centro.</p>
+
+    <div class="dcap"><h3>Inicio · Cine</h3><p>La portada se vuelve un banner ancho con el texto a la izquierda. Las filas muestran más series a la vez.</p></div>
+    <div class="dscroll"><div class="dwin">
+      <div class="dbar"><i></i><i></i><i></i><span>scenya.vercel.app</span></div>
+      <div style="position:relative">
+        <div class="dnav"><span class="lg">Scen<span>ya</span></span><nav><b>Inicio</b><span>Series</span><span>Nuevos</span><span>Géneros</span></nav><span class="sp"></span><span class="srch">Buscar series…</span><span class="btn pri" style="padding:7px 14px">Acceso Total</span></div>
+        <div class="dhero p1">
+          <span class="meta" style="font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--lav-dim)">Romance · 72 episodios · ★ 4.9</span>
+          <h2>Traición en Palacio</h2>
+          <p>La consorte olvidada vuelve al palacio con otro nombre y un solo plan: que el emperador pague.</p>
+          <div style="display:flex;gap:10px"><span class="btn pri">▶ Ver episodio 1 gratis</span><span class="btn sec2">ⓘ Más información</span></div>
+          <div class="po p1 art" style="background:linear-gradient(200deg,#ffb3f1,#ff4fd8 30%,#3a0ca3 80%)"><span class="chip">#1 en México</span></div>
+        </div>
+      </div>
+      <div class="drow">
+        <h4>Continuar viendo</h4>
+        <div class="dcont">
+          <div><div class="po p2"><b>El Heredero Oculto</b><small>Ep 14 de 80</small></div><div class="prog"><i style="width:62%"></i></div></div>
+          <div><div class="po p5"><b>Luna de Sangre</b><small>Ep 3 de 90</small></div><div class="prog"><i style="width:20%"></i></div></div>
+          <div><div class="po p6"><b>Mi CEO Millonario</b><small>Ep 40 de 66</small></div><div class="prog"><i style="width:70%"></i></div></div>
+          <div><div class="po p7"><b>Contrato de Fuego</b><small>Ep 2 de 48</small></div><div class="prog"><i style="width:8%"></i></div></div>
+        </div>
+        <h4>Top 10 en México hoy</h4>
+        <div class="dtop">
+          <div class="t10"><em>1</em><div class="po p3"><b>La Otra Esposa</b></div></div>
+          <div class="t10"><em>2</em><div class="po p6"><b>Mi CEO Millonario</b></div></div>
+          <div class="t10"><em>3</em><div class="po p4"><b>Reina de la Venganza</b></div></div>
+          <div class="t10"><em>4</em><div class="po p8"><b>Después de Medianoche</b></div></div>
+          <div class="t10"><em>5</em><div class="po p5"><b>Luna de Sangre</b></div></div>
+        </div>
+      </div>
+    </div></div>
+
+    <div class="dcap"><h3>Serie · Póster grande</h3><p>En el teléfono son pestañas; en escritorio caben juntas: sinopsis y reseñas a la izquierda, recomendaciones a la derecha.</p></div>
+    <div class="dscroll"><div class="dwin">
+      <div class="dbar"><i></i><i></i><i></i><span>scenya.vercel.app/serie/traicion-en-palacio</span></div>
+      <div style="position:relative">
+        <div class="dnav"><span class="lg">Scen<span>ya</span></span><nav><span>Inicio</span><b>Series</b><span>Nuevos</span><span>Géneros</span></nav><span class="sp"></span><span class="srch">Buscar series…</span></div>
+        <div class="dserie">
+          <div class="blur p1"></div>
+          <div class="po p1"><span class="sb-play"><svg class="fill" viewBox="0 0 24 24"><path d="M7 4v16l13-8z"/></svg></span></div>
+          <div>
+            <span class="chip">Romance · Venganza · Época</span>
+            <h2>Traición en Palacio</h2>
+            <div class="facts"><div><b>72</b>episodios</div><div><b>10</b>gratis</div><div><b>★ 4.9</b>1.8k reseñas</div><div><b>2.4M</b>me gusta</div></div>
+            <div style="display:flex;gap:10px"><span class="btn pri" style="padding:12px 28px">▶ Ver ahora</span><span class="btn sec2">+ Mi lista</span><span class="btn sec2">Compartir</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="dcols">
+        <div>
+          <h4>Sinopsis</h4>
+          <p class="synopsis" style="font-size:14px;max-width:62ch">La consorte Lin fue enterrada viva por orden del emperador. Diez años después regresa al palacio con otro nombre, otro rostro y una lista de cinco personas que no verán la primavera.</p>
+          <h4 style="margin-top:22px">Reseñas de invitados</h4>
+          <div class="drev">
+            <div class="review"><header><span class="who"><span class="av">I2</span>Invitado 2264</span><span class="stars">★★★★★</span></header><p>No pude parar. Cada final de episodio te deja con el corazón en la mano.</p></div>
+            <div class="review"><header><span class="who"><span class="av">I7</span>Invitado 7730</span><span class="stars">★★★★★</span></header><p>La actriz principal es increíble. Pagué el anual sin pensarlo.</p></div>
+          </div>
+        </div>
+        <div>
+          <h4>Otras recomendaciones</h4>
+          <div class="drec">
+            <div class="po p8"><b>Después de Medianoche</b></div><div class="po p3"><b>La Otra Esposa</b></div><div class="po p7"><b>Contrato de Fuego</b></div>
+            <div class="po p4"><b>Reina de la Venganza</b></div><div class="po p2"><b>El Heredero Oculto</b></div><div class="po p5"><b>Luna de Sangre</b></div>
+          </div>
+        </div>
+      </div>
+    </div></div>
+
+    <div class="dcap"><h3>Reproductor tipo TikTok</h3><p>El video vertical va al centro con el fondo difuminado. La lista de episodios queda abierta en un panel a la derecha. El desbloqueo y el pago salen en una ventana al centro, sin cambiar de página.</p></div>
+    <div class="dstates" id="dstates">
+      <button aria-pressed="true" data-d="eps">Lista de episodios</button>
+      <button aria-pressed="false" data-d="comments">Comentarios</button>
+      <button aria-pressed="false" data-d="locked">Episodio bloqueado</button>
+      <button aria-pressed="false" data-d="pay">Pago</button>
+      <button aria-pressed="false" data-d="done">Desbloqueado</button>
+    </div>
+    <div class="dscroll" style="margin-top:12px"><div class="dwin">
+      <div class="dbar"><i></i><i></i><i></i><span>scenya.vercel.app/serie/el-heredero-oculto?ep=10</span></div>
+      <div class="dplay">
+        <div class="dstage">
+          <div class="bgblur p2"></div>
+          <div class="dback"><span class="back"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></span><div><b style="font-family:var(--display)">El Heredero Oculto</b><br><small style="color:var(--lav-dim)">Episodio 10 / 80</small></div></div>
+          <div class="dvid p2">
+            <div class="shade"></div>
+            <div class="sub">—Si firmas esto, el hotel entero es tuyo. Y ellos también.</div>
+            <div class="info"><b>El Heredero Oculto</b><span>Daniel recibe el sobre que lo cambia todo.</span></div>
+            <div class="pbar"><i style="width:72%"></i></div>
+          </div>
+          <div class="drail"><div class="rail">
+            <button><span class="ib"><svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg></span>48.2K</button>
+            <button><span class="ib"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg></span>1,204</button>
+            <button><span class="ib"><svg viewBox="0 0 24 24"><path d="M14 4l7 7-7 7M21 11H9a6 6 0 0 0-6 6v2"/></svg></span>Compartir</button>
+          </div></div>
+          <div class="dupdown"><span title="Episodio anterior (↑)"><svg viewBox="0 0 24 24"><path d="m18 15-6-6-6 6"/></svg></span><span title="Siguiente episodio (↓)"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span></div>
+        </div>
+        <aside class="dside">
+          <div class="dtabs"><button class="on" data-dt="eps">Episodios</button><button data-dt="comments">Comentarios</button></div>
+          <div class="dbody" id="dEps">
+            <div class="ranges"><span class="on">1–30</span><span>31–60</span><span>61–80</span></div>
+            <div class="legend"><span><i style="background:var(--cyan)"></i>Gratis</span><span><i style="background:var(--lav-dim)"></i>Acceso Total</span></div>
+            <div class="epg" id="depg"></div>
+          </div>
+          <div class="dbody" id="dCom" hidden>
+            <div class="comment"><span class="av">I4</span><div><b>Invitado 4821</b><p>NO PUEDE SER que el abogado sea su tío 😱</p></div><span class="heart">♥<br>2.1K</span></div>
+            <div class="comment"><span class="av">I9</span><div><b>Invitado 9017</b><p>La suegra me cae peor cada episodio jajaja</p></div><span class="heart">♥<br>986</span></div>
+            <div class="comment"><span class="av">I2</span><div><b>Invitado 2264</b><p>Alguien más vino por el anuncio y ya va en el 30?</p></div><span class="heart">♥<br>540</span></div>
+            <div class="cinput"><input id="dcin" placeholder="Escribe un comentario…"><button aria-label="Enviar"><svg viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4z"/></svg></button></div>
+          </div>
+        </aside>
+
+        <div class="dover" id="dLocked"><div class="modal">
+          <div class="lockico"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
+          <h3>El episodio 11 es solo para Acceso Total</h3>
+          <p>Desbloquea los 80 episodios y todo el catálogo de Scenya.</p>
+          <button class="plan" aria-pressed="false"><span><b>Mensual</b><small>Se renueva cada mes</small></span><span class="pr">$99<small> MXN</small></span></button>
+          <button class="plan" aria-pressed="true"><span><b>Anual</b><small>Equivale a $83 al mes</small></span><span class="save">AHORRAS $189</span><span class="pr">$999<small> MXN</small></span></button>
+          <button class="btn pri" data-d2="pay">Desbloquear todo</button>
+          <span class="link">Seguir viendo episodios gratis</span>
+        </div></div>
+
+        <div class="dover" id="dPay"><div class="modal" style="text-align:left">
+          <h3>Pagar Acceso Total</h3>
+          <div class="paybody">
+            <div class="sum"><span>Acceso Total · anual</span><b>$999 MXN</b></div>
+            <div class="wallet"><button class="apple"> Pay</button><button class="gpay"><b style="color:#4285f4">G</b> Pay</button></div>
+            <div class="or">o paga con tarjeta</div>
+            <div class="field">4242 4242 4242 4242</div>
+            <div class="field2"><div class="field">12 / 28</div><div class="field">CVC 123</div></div>
+            <button class="btn pri" data-d2="done">Pagar $999 MXN</button>
+            <p class="secure">🔒 Pago seguro con Stripe · Cancela cuando quieras</p>
+          </div>
+        </div></div>
+
+        <div class="dover" id="dDone"><div class="modal success">
+          <div class="lockico"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg></div>
+          <h3>¡Desbloqueaste todos los episodios!</h3>
+          <p>Ya tienes Acceso Total. Sigue viendo donde te quedaste.</p>
+          <button class="btn pri" data-d2="eps">▶ Continuar episodio 11</button>
+        </div></div>
+      </div>
+    </div></div>
+
+    <div class="dtable">
+      <div><b>Siguiente episodio</b>Rueda del mouse o flechas ↑ ↓ del teclado, igual que deslizar en el teléfono.</div>
+      <div><b>Panel derecho</b>Episodios y comentarios en pestañas, siempre visibles junto al video.</div>
+      <div><b>Ventanas al centro</b>Desbloqueo, pago y "Desbloqueaste todo" aparecen encima del video y al cerrarse sigue reproduciendo.</div>
+      <div><b>Tamaño de ventana</b>Si la ventana es angosta (tablet), el panel se oculta y vuelve a ser hoja desde abajo, como en el teléfono.</div>
+    </div>
+  </section>
+
   <p class="note">Mockups interactivos de Scenya. Las portadas son degradados de ejemplo; en la app real van las imágenes de cada serie.</p>
 </div>
 
@@ -642,7 +874,7 @@ svg.fill{fill:currentColor;stroke:none}
   const tabs=[...document.querySelectorAll('[data-tab]')];
   function show(id){
     tabs.forEach(t=>t.setAttribute('aria-selected',t.dataset.tab===id));
-    ['inicio','serie','player'].forEach(s=>document.getElementById(s).hidden=s!==id);
+    ['inicio','serie','player','desk'].forEach(s=>document.getElementById(s).hidden=s!==id);
     if(id==='player'&&!opened){opened=true;setTimeout(()=>open('eps'),450);}
     window.scrollTo({top:0,behavior:'smooth'});
   }
@@ -755,5 +987,29 @@ svg.fill{fill:currentColor;stroke:none}
     document.querySelector('.epbar span').innerHTML='▤ Episodios 1–80 · <b style="color:var(--cyan)">10 gratis</b>';setTimeout(()=>open('eps'),300);};
 
   go(1);
+})();
+
+(function(){
+  // Escritorio: lista de episodios y estados de ventanas
+  const g=document.getElementById('depg');
+  for(let n=1;n<=30;n++){
+    const b=document.createElement('span');
+    b.className='ep '+(n===10?'cur':n>10?'lock':'free')+(n<10?' watched':'');
+    b.innerHTML=n+(n>10?'<svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>':'');
+    g.appendChild(b);
+  }
+  const over={locked:'dLocked',pay:'dPay',done:'dDone'};
+  const btns=[...document.querySelectorAll('[data-d]')];
+  function set(k){
+    btns.forEach(b=>b.setAttribute('aria-pressed',b.dataset.d===k));
+    Object.entries(over).forEach(([key,id])=>document.getElementById(id).classList.toggle('on',key===k));
+    const com=k==='comments';
+    document.getElementById('dEps').hidden=com;document.getElementById('dCom').hidden=!com;
+    document.querySelectorAll('[data-dt]').forEach(t=>t.classList.toggle('on',t.dataset.dt===(com?'comments':'eps')));
+  }
+  btns.forEach(b=>b.onclick=()=>set(b.dataset.d));
+  document.querySelectorAll('[data-d2]').forEach(b=>b.onclick=()=>set(b.dataset.d2));
+  document.querySelectorAll('[data-dt]').forEach(t=>t.onclick=()=>set(t.dataset.dt));
+  if(location.hash==='#desk')document.querySelector('[data-tab=desk]').click();
 })();
 </script>
