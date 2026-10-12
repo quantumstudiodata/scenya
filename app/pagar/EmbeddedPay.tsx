@@ -1,14 +1,12 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
 import { createClient } from "@/lib/supabase/browser";
 
-const key = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
-const stripePromise = key ? loadStripe(key) : null;
-
-export default function EmbeddedPay({ plan }: { plan: "mensual" | "anual" }) {
+export default function EmbeddedPay({ plan, publishableKey }: { plan: "mensual" | "anual"; publishableKey?: string }) {
+  const stripePromise = useMemo(() => (publishableKey ? loadStripe(publishableKey) : null), [publishableKey]);
   const [error, setError] = useState("");
 
   const fetchClientSecret = useCallback(async () => {

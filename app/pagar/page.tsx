@@ -34,7 +34,7 @@ export default async function Pagar({ searchParams }: { searchParams: Promise<{ 
           </ul>
           <p className="muted" style={{ fontSize: 13 }}>Pago seguro con Stripe. Puedes pagar con tarjeta, Apple Pay o Google Pay.</p>
         </aside>
-        <EmbeddedPay plan={plan} />
+        <EmbeddedPay plan={plan} publishableKey={process.env.STRIPE_PUBLISHABLE_KEY ?? process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY} />
       </div>
     </div>
   );
