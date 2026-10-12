@@ -1,0 +1,151 @@
+<title>El Contrato de los Siete Días</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: guion de producción — encabezado, fichas de personajes, selector de episodio y lista de tomas copiables. */
+:root{
+  --ink:#080130;--ink-2:#120a4d;--ink-3:#1c1366;--lav:#ece9ff;--dim:rgba(236,233,255,.64);
+  --line:rgba(236,233,255,.13);--violet:#7c5cff;--cyan:#35e0ff;--gold:#ffcf5c;--pink:#ff4fd8;
+  --display:"Sora",system-ui,sans-serif;--body:"Inter",system-ui,sans-serif;color-scheme:dark}
+*{box-sizing:border-box;margin:0}
+body{background:var(--ink);color:var(--lav);font:15px/1.55 var(--body);padding-inline:16px;padding-block:28px 60px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.doc{max-width:980px;margin:auto;display:grid;gap:28px}
+.eyebrow{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--cyan)}
+header h1{font-size:clamp(30px,5vw,46px);line-height:1.05;letter-spacing:-1px;margin:8px 0 10px}
+header p{color:var(--dim);max-width:62ch}
+.meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.meta span{font-size:13px;border:1px solid var(--line);border-radius:99px;padding:4px 12px;color:var(--dim)}
+h2{font-size:20px;margin-bottom:12px}
+.chars{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,280px),1fr));gap:12px}
+.char{background:var(--ink-2);border:1px solid var(--line);border-radius:16px;padding:14px;display:grid;gap:6px;min-width:0}
+.char header{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.char b{font-family:var(--display)}
+.ref{font-size:12px;color:var(--cyan);font-variant-numeric:tabular-nums}
+.char p{font-size:13px;color:var(--dim)}
+.style{background:var(--ink-2);border:1px dashed var(--line);border-radius:14px;padding:12px 14px;font-size:13px;color:var(--dim);display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.style code{color:var(--lav);font-size:13px}
+.clues{display:grid;gap:8px;padding:0;list-style:none}
+.clues li{display:grid;grid-template-columns:56px 1fr;gap:10px;font-size:14px;color:var(--dim)}
+.clues b{color:var(--gold);font-variant-numeric:tabular-nums}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;position:sticky;top:0;z-index:5;background:var(--ink);padding-block:10px;border-bottom:1px solid var(--line)}
+.tabs button{min-width:44px;padding:8px 12px;border-radius:99px;background:var(--ink-2);border:1px solid var(--line);font:600 14px var(--display);font-variant-numeric:tabular-nums}
+.tabs button[aria-selected="true"]{background:var(--lav);color:var(--ink);border-color:transparent}
+.tabs button.pay{border-color:var(--gold)}
+.ep h3{font-size:clamp(24px,4vw,32px);letter-spacing:-.5px}
+.ep .sum{color:var(--dim);margin:6px 0 12px;max-width:68ch}
+.hook{background:linear-gradient(90deg,rgba(124,92,255,.22),rgba(53,224,255,.08));border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-size:14px;margin-bottom:16px}
+.hook b{color:var(--cyan)}
+.shots{display:grid;gap:10px;padding:0;list-style:none}
+.shot{display:grid;grid-template-columns:36px minmax(0,1fr) auto;gap:12px;align-items:start;background:var(--ink-2);border:1px solid var(--line);border-radius:16px;padding:12px 14px}
+.num{font:700 15px var(--display);color:var(--dim);font-variant-numeric:tabular-nums;padding-top:2px}
+.shot p{font-size:14px}
+.line{margin-top:6px;font-size:14px;color:var(--lav);border-left:2px solid var(--pink);padding-left:10px;font-style:italic}
+.tags{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.chip{font-size:11px;font-weight:600;padding:2px 9px;border-radius:99px;background:var(--ink-3);color:var(--dim)}
+.chip.kling{color:var(--cyan)}
+.chip.wan{color:var(--gold)}
+.copy{font-size:12px;font-weight:600;border:1px solid var(--line);border-radius:99px;padding:6px 12px;white-space:nowrap}
+.copy:hover{border-color:var(--cyan)}
+.copy.ok{background:var(--cyan);color:var(--ink);border-color:transparent}
+.cost{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:12px}
+.cost div{background:var(--ink-2);border:1px solid var(--line);border-radius:16px;padding:14px}
+.cost b{display:block;font:800 26px var(--display);font-variant-numeric:tabular-nums}
+.cost span{font-size:13px;color:var(--dim)}
+.note{font-size:13px;color:var(--dim)}
+@media(max-width:560px){.shot{grid-template-columns:28px minmax(0,1fr)}.shot .copy{grid-column:2;justify-self:start}}
+</style>
+
+<div class="doc">
+  <header>
+    <span class="eyebrow">Scenya · Guion de producción</span>
+    <h1>El Contrato de los Siete Días</h1>
+    <p>Elaine finge ser la prometida de David durante una semana en su isla privada. Ninguno de los dos dice toda la verdad.</p>
+    <div class="meta"><span>Romance · Falsa relación</span><span>30 episodios de 60 s</span><span>Gratis: episodios 1–10</span><span>Tomas de 5 s</span></div>
+  </header>
+
+  <section>
+    <h2>Personajes</h2>
+    <div class="chars" id="chars"></div>
+  </section>
+
+  <div class="style"><span>Estilo para todas las tomas: <code id="styleText"></code></span><button class="copy" data-copy="style">Copiar</button></div>
+
+  <section>
+    <h2>Pistas del final</h2>
+    <p class="note" style="margin-bottom:10px">Elaine siempre lo recordó todo. Estos detalles hacen que el giro final sea justo. No se explican nunca.</p>
+    <ul class="clues">
+      <li><b>Ep 2</b>Enciende la luz del muelle sin que nadie le diga dónde está el interruptor.</li>
+      <li><b>Ep 4</b>Dormida dice "Gael…".</li>
+      <li><b>Ep 8</b>Cuando David habla de quien lo abandonó, aprieta los ojos y calla.</li>
+      <li><b>Ep 10</b>Jura que no lo recuerda, pero su mano tiembla.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Episodios</h2>
+    <div class="tabs" role="tablist" id="tabs"></div>
+    <article class="ep" id="ep" style="margin-top:18px"></article>
+    <p class="note" style="margin-top:14px">"Copiar" arma el prompt completo de la toma: personajes que aparecen, acción, diálogo y estilo. Pégalo en el generador junto con las imágenes de referencia.</p>
+  </section>
+
+  <section>
+    <h2>Costo estimado · episodios 2–10</h2>
+    <div class="cost">
+      <div><b>108</b><span>tomas de 5 segundos</span></div>
+      <div><b>~$65 USD</b><span>con Kling 3.0 Pro en primeros planos, 2 intentos por toma</span></div>
+      <div><b>~$45 USD</b><span>usando Kling 2.5 Turbo en las tomas menos importantes</span></div>
+    </div>
+  </section>
+</div>
+
+<script>
+const EPS=[{"n": 2, "title": "Bienvenida a la isla", "summary": "Llegan en yate a la isla. David le dicta las reglas del contrato.", "hook": "Elaine enciende la luz del muelle sin buscar el interruptor. David lo nota.", "shots": [{"n": 1, "shot": "Toma aérea: yate blanco cruzando mar turquesa hacia una isla con villa blanca", "line": "", "model": "Wan"}, {"n": 2, "shot": "Elaine en la proa, viento en el cabello, mira la isla con los ojos entrecerrados", "line": "", "model": "Kling"}, {"n": 3, "shot": "David a su lado sin mirarla, lentes oscuros", "line": "\"Regla uno: en público eres mi prometida.\"", "model": "Kling"}, {"n": 4, "shot": "Plano detalle: él le pone un anillo de diamante en la mano, sin delicadeza", "line": "\"Regla dos: en privado, no existes.\"", "model": "Wan"}, {"n": 5, "shot": "Elaine mira el anillo y luego a él, irónica", "line": "\"¿Y la regla tres?\"", "model": "Kling"}, {"n": 6, "shot": "David se quita los lentes, la mira fijo", "line": "\"No te enamores de mí.\"", "model": "Kling"}, {"n": 7, "shot": "Elaine suelta una risa breve, de espaldas a cámara", "line": "\"Eso no va a ser un problema.\" (voz)", "model": "Wan"}, {"n": 8, "shot": "El yate atraca; atardecer; muelle de madera a oscuras", "line": "", "model": "Wan"}, {"n": 9, "shot": "Elaine estira la mano sin mirar y enciende un interruptor escondido en un poste", "line": "", "model": "Wan"}, {"n": 10, "shot": "Las luces del muelle se encienden una por una", "line": "", "model": "Wan"}, {"n": 11, "shot": "Primer plano de David, desconcertado, mirándola", "line": "\"¿Cómo sabías dónde estaba?\"", "model": "Kling"}, {"n": 12, "shot": "Elaine sigue caminando sin voltear. **Corte a negro.**", "line": "", "model": "Wan"}]}, {"n": 3, "title": "La abuela", "summary": "Doña Inés los recibe y los pone a prueba con preguntas.", "hook": "\"Mi nieto solo trajo a alguien a esta isla una vez… hace siete años.\"", "shots": [{"n": 1, "shot": "Terraza de la villa al anochecer; Doña Inés sentada como reina, copa de vino", "line": "", "model": "Wan"}, {"n": 2, "shot": "Doña Inés mira a Elaine de arriba abajo", "line": "\"Así que tú eres la elegida.\"", "model": "Kling"}, {"n": 3, "shot": "Elaine sonríe con calma y toma la mano de David", "line": "\"Y él es mi elegido, señora.\"", "model": "Kling"}, {"n": 4, "shot": "Plano detalle: los dedos de David se tensan en la mano de ella", "line": "", "model": "Wan"}, {"n": 5, "shot": "Doña Inés entrecierra los ojos", "line": "\"¿Dónde se conocieron?\"", "model": "Kling"}, {"n": 6, "shot": "David abre la boca para contestar; Elaine se adelanta", "line": "\"En una librería. Él quería un libro en francés y no sabía pedirlo.\"", "model": "Kling"}, {"n": 7, "shot": "David la mira de reojo, sorprendido de lo bien que miente", "line": "", "model": "Kling"}, {"n": 8, "shot": "Doña Inés ríe suavemente y deja la copa", "line": "\"Mi David nunca ha leído en francés.\"", "model": "Kling"}, {"n": 9, "shot": "Elaine, sin perder la sonrisa", "line": "\"Por eso me necesitaba.\"", "model": "Kling"}, {"n": 10, "shot": "La abuela se levanta y pasa junto a Elaine; le habla al oído", "line": "", "model": "Wan"}, {"n": 11, "shot": "Primer plano de Doña Inés, susurrando", "line": "\"Mi nieto solo trajo a alguien a esta isla una vez… hace siete años.\"", "model": "Kling"}, {"n": 12, "shot": "Elaine se queda inmóvil, la sonrisa se le congela. **Corte a negro.**", "line": "", "model": "Kling"}]}, {"n": 4, "title": "Una sola cama", "summary": "Comparten recámara. Solo hay una cama. Esa noche Elaine habla dormida.", "hook": "\"Gael…\". David se congela.", "shots": [{"n": 1, "shot": "Recámara de lujo, una sola cama enorme, cortinas al viento", "line": "", "model": "Wan"}, {"n": 2, "shot": "Elaine en la puerta con su maleta, mira la cama y luego a David", "line": "\"Dijiste cero intimidad.\"", "model": "Kling"}, {"n": 3, "shot": "David se quita el saco y lo lanza al sofá", "line": "\"El sofá es mío. No te emociones.\"", "model": "Kling"}, {"n": 4, "shot": "Plano detalle: él coloca una almohada en el centro de la cama, como muro", "line": "", "model": "Wan"}, {"n": 5, "shot": "Elaine levanta una ceja", "line": "\"¿Y eso?\"", "model": "Kling"}, {"n": 6, "shot": "David, serio", "line": "\"Por si acaso eres sonámbula.\" (voz)", "model": "Wan"}, {"n": 7, "shot": "Noche: luz de luna azul, David en el sofá con los ojos abiertos", "line": "", "model": "Wan"}, {"n": 8, "shot": "Elaine dormida, inquieta, frunce el ceño", "line": "", "model": "Kling"}, {"n": 9, "shot": "David se acerca despacio y la cubre con la sábana", "line": "", "model": "Wan"}, {"n": 10, "shot": "Primer plano de los labios de Elaine, dormida", "line": "\"Gael… no…\"", "model": "Kling"}, {"n": 11, "shot": "David se congela; su sombra se alarga en la pared", "line": "", "model": "Wan"}, {"n": 12, "shot": "Primer plano de David, la mandíbula apretada", "line": "\"¿Cómo conoces ese nombre?\" (susurro) **Corte a negro.**", "model": "Kling"}]}, {"n": 5, "title": "La gala", "summary": "Cena de gala. Aparece Vanessa, la ex, para humillar a Elaine.", "hook": "\"David, ¿ya le dijiste quién es ella en realidad?\"", "shots": [{"n": 1, "shot": "Salón de gala con candelabros, invitados elegantes", "line": "", "model": "Wan"}, {"n": 2, "shot": "Elaine baja la escalera con vestido azul noche; todos voltean", "line": "", "model": "Wan"}, {"n": 3, "shot": "David la ve; por un segundo pierde la frialdad", "line": "", "model": "Kling"}, {"n": 4, "shot": "Vanessa se acerca con dos copas, sonrisa venenosa", "line": "\"Qué valiente: venir vestida de prestado.\"", "model": "Kling"}, {"n": 5, "shot": "Murmullos; invitados mirando", "line": "", "model": "Wan"}, {"n": 6, "shot": "Elaine toma una copa con calma y le contesta en francés", "line": "\"Le venin ne va qu'aux serpents, ma chère.\"", "model": "Kling"}, {"n": 7, "shot": "Un invitado francés suelta una carcajada", "line": "", "model": "Wan"}, {"n": 8, "shot": "Vanessa no entiende; enrojece", "line": "\"¿Qué dijo?\"", "model": "Kling"}, {"n": 9, "shot": "David, a su lado, conteniendo una sonrisa", "line": "\"Que el veneno solo le queda a las serpientes.\"", "model": "Kling"}, {"n": 10, "shot": "Vanessa se acerca a David, le acomoda la corbata", "line": "", "model": "Wan"}, {"n": 11, "shot": "Primer plano de Vanessa, mirando a Elaine", "line": "\"David… ¿ya le dijiste quién es ella en realidad?\"", "model": "Kling"}, {"n": 12, "shot": "Elaine y David se miran; silencio. **Corte a negro.**", "line": "", "model": "Kling"}]}, {"n": 6, "title": "La foto", "summary": "David baila con Elaine para callar los rumores. Casi se besan. Más tarde ella encuentra algo.", "hook": "En un cajón hay una foto vieja de Elaine… abrazada a un hombre idéntico a David.", "shots": [{"n": 1, "shot": "David le tiende la mano a Elaine en medio del salón", "line": "\"Baila conmigo. Todos están mirando.\"", "model": "Kling"}, {"n": 2, "shot": "Vals lento, la cámara gira alrededor de ellos", "line": "", "model": "Wan"}, {"n": 3, "shot": "Elaine, en voz baja", "line": "\"¿Qué quiso decir Vanessa?\"", "model": "Kling"}, {"n": 4, "shot": "David, sin dejar de bailar", "line": "\"Nada que tengas que saber.\"", "model": "Kling"}, {"n": 5, "shot": "Primer plano: sus caras a centímetros, las respiraciones se mezclan", "line": "", "model": "Kling"}, {"n": 6, "shot": "Un mesero tira una charola; el momento se rompe", "line": "", "model": "Wan"}, {"n": 7, "shot": "Noche: Elaine sola en el despacho de David, buscando algo con una lámpara", "line": "", "model": "Wan"}, {"n": 8, "shot": "Abre un cajón; hay un sobre amarillo", "line": "", "model": "Wan"}, {"n": 9, "shot": "Plano detalle: saca una foto vieja", "line": "", "model": "Wan"}, {"n": 10, "shot": "Foto: Elaine joven abrazada a un hombre idéntico a David, con cicatriz en la ceja", "line": "", "model": "Wan"}, {"n": 11, "shot": "Primer plano de Elaine; ningún gesto de sorpresa, solo frialdad", "line": "", "model": "Kling"}, {"n": 12, "shot": "Voz de David detrás de ella", "line": "\"¿Buscabas algo?\" **Corte a negro.**", "model": "Wan"}]}, {"n": 7, "title": "El mar", "summary": "Elaine esconde la foto y finge calma. En un paseo en lancha cae al mar.", "hook": "Alguien los observa con binoculares desde un acantilado.", "shots": [{"n": 1, "shot": "Elaine se gira; sostiene un libro, no la foto", "line": "\"Algo para leer. No podía dormir.\"", "model": "Kling"}, {"n": 2, "shot": "David la mira largo y luego asiente", "line": "\"Mañana te llevo a la cala. Mi abuela insiste.\"", "model": "Kling"}, {"n": 3, "shot": "Mañana: lancha pequeña en mar abierto, sol intenso", "line": "", "model": "Wan"}, {"n": 4, "shot": "Elaine de pie en la orilla de la lancha; una ola fuerte golpea", "line": "", "model": "Wan"}, {"n": 5, "shot": "Ella cae al agua", "line": "", "model": "Wan"}, {"n": 6, "shot": "Bajo el agua: Elaine hundiéndose, burbujas, luz desde arriba", "line": "", "model": "Wan"}, {"n": 7, "shot": "David se lanza al agua sin dudar", "line": "", "model": "Wan"}, {"n": 8, "shot": "Él la saca a la superficie, ambos jadeando", "line": "\"¡Respira! ¡Elaine, respira!\"", "model": "Kling"}, {"n": 9, "shot": "En la arena, ella tose; él le aparta el cabello mojado de la cara", "line": "", "model": "Kling"}, {"n": 10, "shot": "Elaine, débil", "line": "\"Pensé que no te importaba.\"", "model": "Kling"}, {"n": 11, "shot": "David, con la voz rota", "line": "\"Yo tampoco lo pensaba.\"", "model": "Kling"}, {"n": 12, "shot": "Plano lejano desde un acantilado: alguien los mira con binoculares. **Corte a negro.**", "line": "", "model": "Wan"}]}, {"n": 8, "title": "Fiebre", "summary": "Tormenta. Elaine tiene fiebre y David la cuida toda la noche. Él cuenta algo de su pasado.", "hook": "La abuela anuncia una rueda de prensa para mañana: el compromiso será oficial.", "shots": [{"n": 1, "shot": "Tormenta golpeando la villa, relámpagos", "line": "", "model": "Wan"}, {"n": 2, "shot": "Elaine en cama, sudando, temblando", "line": "", "model": "Kling"}, {"n": 3, "shot": "David le pone un paño húmedo en la frente", "line": "\"Eres terca hasta para enfermarte.\"", "model": "Kling"}, {"n": 4, "shot": "Elaine sonríe débilmente", "line": "\"Es parte del contrato.\"", "model": "Kling"}, {"n": 5, "shot": "David sentado en el piso junto a la cama, mirando la lluvia", "line": "", "model": "Wan"}, {"n": 6, "shot": "David, sin mirarla", "line": "\"Hace siete años alguien me dejó en el altar. Sin una carta. Sin nada.\"", "model": "Kling"}, {"n": 7, "shot": "Primer plano: Elaine aprieta los ojos. No dice nada. (pista)", "line": "", "model": "Kling"}, {"n": 8, "shot": "David, amargo", "line": "\"Desde entonces no creo en nadie.\"", "model": "Kling"}, {"n": 9, "shot": "Ella le toma la mano sin abrir los ojos", "line": "", "model": "Wan"}, {"n": 10, "shot": "Amanecer: él dormido junto a la cama, todavía tomados de la mano", "line": "", "model": "Wan"}, {"n": 11, "shot": "La puerta se abre; Doña Inés en el umbral", "line": "\"Levántense. Mañana hay rueda de prensa: anunciaremos la boda.\"", "model": "Kling"}, {"n": 12, "shot": "Elaine y David se miran, alarmados. **Corte a negro.**", "line": "", "model": "Kling"}]}, {"n": 9, "title": "La prensa", "summary": "Vanessa filtró a la prensa que el compromiso es falso. Los periodistas quieren pruebas.", "hook": "\"¡Que se besen! ¡Que se besen!\"", "shots": [{"n": 1, "shot": "Jardín de la villa lleno de periodistas, cámaras y micrófonos", "line": "", "model": "Wan"}, {"n": 2, "shot": "Vanessa entre los periodistas, celular en mano, sonriendo", "line": "", "model": "Kling"}, {"n": 3, "shot": "Elaine y David salen tomados de la mano; flashes", "line": "", "model": "Wan"}, {"n": 4, "shot": "Periodista con micrófono", "line": "\"Señor Zavaleta, ¿es cierto que su compromiso es un contrato?\"", "model": "Kling"}, {"n": 5, "shot": "David, impasible", "line": "\"Mi compromiso es asunto mío.\"", "model": "Kling"}, {"n": 6, "shot": "Otra periodista", "line": "\"Entonces demuéstrelo.\"", "model": "Kling"}, {"n": 7, "shot": "Doña Inés, en primera fila, cruza los brazos y espera", "line": "", "model": "Kling"}, {"n": 8, "shot": "Un periodista empieza a corear; otros se le unen", "line": "\"¡Que se besen! ¡Que se besen!\"", "model": "Wan"}, {"n": 9, "shot": "Primer plano de Elaine: pánico contenido", "line": "", "model": "Kling"}, {"n": 10, "shot": "Primer plano de David: duda", "line": "", "model": "Kling"}, {"n": 11, "shot": "Él gira hacia ella despacio", "line": "\"Perdóname por esto.\"", "model": "Kling"}, {"n": 12, "shot": "Se acerca a su rostro. **Corte a negro justo antes del beso.**", "line": "", "model": "Kling"}]}, {"n": 10, "title": "El beso", "summary": "El beso obligado frente a la prensa. Luego una foto revela que se conocían.", "hook": "\"¿De verdad no te acuerdas de mí?\" → \"No.\" Su mano tiembla.", "shots": [{"n": 1, "shot": "El beso. La cámara gira lentamente alrededor de ellos. Flashes congelados", "line": "", "model": "Kling"}, {"n": 2, "shot": "Primer plano de la mano de Elaine aferrándose al saco de David", "line": "", "model": "Wan"}, {"n": 3, "shot": "Se separan; se miran sin aliento. Ya no es actuación", "line": "", "model": "Kling"}, {"n": 4, "shot": "Vanessa da un paso al frente con una foto impresa", "line": "\"Qué romántico. ¿Y esto qué es?\"", "model": "Kling"}, {"n": 5, "shot": "Plano detalle: foto de Elaine joven y David en esta misma playa, hace 7 años", "line": "", "model": "Wan"}, {"n": 6, "shot": "Los periodistas se lanzan; flashes", "line": "\"¡Señorita Valdés! ¿Por qué dijo que se conocieron hace tres meses?\"", "model": "Wan"}, {"n": 7, "shot": "Doña Inés mira a Elaine con ojos fríos", "line": "", "model": "Kling"}, {"n": 8, "shot": "David toma a Elaine del brazo y la aparta de la multitud", "line": "", "model": "Wan"}, {"n": 9, "shot": "Detrás de la villa, solos. David, con voz quebrada", "line": "\"¿De verdad no te acuerdas de mí?\"", "model": "Kling"}, {"n": 10, "shot": "Primer plano de Elaine, ojos húmedos", "line": "\"No, David. No te recuerdo.\"", "model": "Kling"}, {"n": 11, "shot": "David se va sin decir nada", "line": "", "model": "Wan"}, {"n": 12, "shot": "Plano detalle: la mano de Elaine temblando. Sonido de olas. **Corte a negro.** Texto: *\"Desbloquea el episodio 11\"*", "line": "", "model": "Wan"}]}];
+const STYLE="vertical 9:16, cinematográfico, fotorrealista, luz cálida de atardecer, poca profundidad de campo, paleta azul noche y dorado";
+const CHARS=[
+  {key:"Elaine",ref:"@Image1",name:"Elaine Valdés",role:"27 · traductora",desc:"mujer de 27 años, ojos verdes, pecas, cabello oscuro ondulado a los hombros, blusa de seda blanca"},
+  {key:"David",ref:"@Image2",name:"David Zavaleta",role:"32 · magnate",desc:"hombre de 32 años, mandíbula marcada, cabello oscuro peinado hacia atrás, traje azul marino a medida"},
+  {key:"Inés",ref:"@Image4",name:"Doña Inés Zavaleta",role:"78 · la abuela",desc:"mujer de 78 años, cabello blanco recogido, collar de perlas, vestido verde esmeralda, mirada aguda"},
+  {key:"Vanessa",ref:"@Image5",name:"Vanessa Ríos",role:"30 · la ex de David",desc:"mujer de 30 años, cabello rubio liso, labios rojos, vestido de gala negro, sonrisa venenosa"},
+  {key:"idéntico a David",ref:"@Image6",name:"Gael Zavaleta",role:"el mellizo · solo en fotos",desc:"idéntico a David, pero con una cicatriz en la ceja izquierda y chaqueta de cuero"}
+];
+const $=s=>document.querySelector(s);
+const esc=s=>s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const md=s=>esc(s).replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/\*(.+?)\*/g,"<i>$1</i>");
+const plain=s=>s.replace(/\*\*?/g,"");
+$("#styleText").textContent=STYLE;
+$("#chars").innerHTML=CHARS.map(c=>`<div class="char"><header><b>${c.name}</b><span class="ref">${c.ref}</span></header><span class="note">${c.role}</span><p>${c.desc}</p></div>`).join("");
+
+function speaker(ep,shot){
+  const t=shot.shot+" "+shot.line;
+  return CHARS.filter(c=>t.includes(c.key)||(c.key==="Inés"&&/abuela|Doña/.test(t))).map(c=>`${c.ref} (${c.name}): ${c.desc}`);
+}
+function prompt(ep,s){
+  const parts=[plain(s.shot.replace(/\(pista\)/,"")).trim()];
+  const who=speaker(ep,s); if(who.length) parts.push("Personajes: "+who.join("; "));
+  if(s.line) parts.push("Diálogo: "+plain(s.line));
+  parts.push(STYLE);
+  return parts.join(". ").replace(/\.\./g,".");
+}
+async function copy(text,btn){
+  try{await navigator.clipboard.writeText(text);btn.textContent="Copiado";btn.classList.add("ok");setTimeout(()=>{btn.textContent="Copiar";btn.classList.remove("ok")},1400);}
+  catch{const r=document.createRange();const p=btn.closest(".shot,.style").querySelector("p,code");r.selectNodeContents(p);const sel=getSelection();sel.removeAllRanges();sel.addRange(r);btn.textContent="Selecciona y copia";}
+}
+document.querySelector("[data-copy=style]").onclick=e=>copy(STYLE,e.currentTarget);
+
+let cur=EPS[0].n;
+function render(){
+  $("#tabs").innerHTML=`<button disabled title="Ya lo tienes" style="opacity:.45">1</button>`+EPS.map(e=>`<button role="tab" aria-selected="${e.n===cur}" class="${e.n===10?'pay':''}" data-n="${e.n}">${e.n}</button>`).join("");
+  const e=EPS.find(x=>x.n===cur);
+  $("#ep").innerHTML=`<span class="eyebrow">Episodio ${e.n}${e.n===10?" · último gratis":""}</span>
+    <h3>${md(e.title)}</h3><p class="sum">${md(e.summary)}</p>
+    <div class="hook"><b>Cómo termina:</b> ${md(e.hook)}</div>
+    <ol class="shots">${e.shots.map((s,i)=>`<li class="shot"><span class="num">${s.n}</span><div><p>${md(s.shot)}</p>${s.line?`<div class="line">${md(s.line)}</div>`:""}<div class="tags"><span class="chip ${s.model.toLowerCase()}">${s.model}</span></div></div><button class="copy" data-i="${i}">Copiar</button></li>`).join("")}</ol>`;
+  document.querySelectorAll("#tabs [data-n]").forEach(b=>b.onclick=()=>{cur=+b.dataset.n;render();try{localStorage.setItem("contrato:ep",cur)}catch{} $("#tabs").scrollIntoView({block:"start",behavior:"smooth"});});
+  document.querySelectorAll("#ep .copy").forEach(b=>b.onclick=()=>copy(prompt(e,e.shots[+b.dataset.i]),b));
+}
+try{const s=+localStorage.getItem("contrato:ep");if(EPS.some(e=>e.n===s))cur=s;}catch{}
+render();
+</script>
