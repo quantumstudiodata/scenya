@@ -1,6 +1,7 @@
 import "server-only";
 import { createAdminClient } from "./supabase/admin";
 
+// Valor por defecto; cada serie define sus propios episodios gratis (series.free_episodes).
 export const FREE_EPISODES = 10;
 
 const ACTIVE = ["active", "trialing"];

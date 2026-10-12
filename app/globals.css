@@ -310,5 +310,63 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
   .vbar{bottom:44px}
 }
 .epbar{display:none;position:absolute;left:0;right:0;bottom:0;height:44px;z-index:3;background:rgba(8,1,48,.85);backdrop-filter:blur(8px);align-items:center;justify-content:space-between;padding:0 16px;font-size:13px;border-top:1px solid var(--line)}
-@media(max-width:420px){.nav .btn.primary{display:none}}
+@media(max-width:520px){.nav .btn.primary{display:none}.umenu>button{padding:6px}.ulabel{display:none}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+/* ---------- Administrador ---------- */
+.admin{padding-block:24px 40px}
+.alist{display:grid;gap:8px}
+.arow{display:flex;align-items:center;gap:14px;background:var(--ink-2);border:1px solid var(--line);border-radius:14px;padding:10px 14px;min-width:0}
+a.arow:hover{border-color:var(--cyan)}
+.athumb{width:44px;aspect-ratio:2/3;border-radius:8px;flex:none;display:grid;place-items:center;text-align:center;font-size:11px;color:var(--lav-dim);background-size:cover;background-position:center}
+.athumb.big{width:180px;border-radius:16px;border:1px solid var(--line)}
+.ainfo{display:grid;flex:1;min-width:0}
+.ainfo small{color:var(--lav-dim);font-size:12px}
+.aform{display:grid;grid-template-columns:200px minmax(0,1fr);gap:28px}
+.poster-pick{display:grid;gap:10px;justify-items:center;cursor:pointer;align-content:start}
+.afields{display:grid;gap:14px;min-width:0}
+.arow2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+select{background:rgba(236,233,255,.06);border:1px solid var(--line);border-radius:12px;padding:11px 13px;color:var(--lav);font:15px var(--body);width:100%}
+select option{background:var(--ink-2)}
+.check{display:flex;align-items:center;gap:10px;color:var(--lav)}
+.check input{width:auto}
+.btn.small{padding:7px 12px;font-size:12px}
+.btn.danger{color:var(--danger)}
+.ep-row input{flex:1;min-width:0;padding:8px 10px;font-size:14px}
+.epn{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:rgba(53,224,255,.12);color:var(--cyan);font-family:var(--display);flex:none;font-variant-numeric:tabular-nums}
+.epn.lockd{background:rgba(236,233,255,.06);color:var(--lav-dim)}
+.vstat{font-size:12px;color:var(--danger);white-space:nowrap}
+.vstat.ok{color:var(--cyan)}
+@media(max-width:700px){.aform{grid-template-columns:1fr}.arow2{grid-template-columns:1fr}.ep-row{flex-wrap:wrap}}
+.empty-state{background:var(--ink-2);border:1px dashed var(--line);border-radius:20px;padding:32px;display:grid;gap:10px;justify-items:start}
+
+/* ---------- Mi cuenta ---------- */
+.account{padding-block:28px 40px;display:grid;gap:20px}
+.acc-head{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.acc-head h1{font-size:30px}
+.acc-head .btn{margin-left:auto}
+.av.big{width:56px;height:56px;font-size:22px}
+.acc-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.card-sec{background:var(--ink-2);border:1px solid var(--line);border-radius:20px;padding:20px;display:grid;gap:12px;align-content:start;min-width:0}
+.card-sec.wide{grid-column:1/-1}
+.card-sec h2{font-size:18px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:14px}
+.kv dt{color:var(--lav-dim)}
+.kv dd{margin:0;overflow-wrap:anywhere}
+.pill{justify-self:start;font-size:12px;font-weight:600;padding:4px 12px;border-radius:99px;background:rgba(236,233,255,.08);color:var(--lav-dim)}
+.pill.ok{background:rgba(53,224,255,.14);color:var(--cyan)}
+.small{font-size:12px}
+.aform-col{display:grid;gap:10px}
+.prules{list-style:none;padding:0;display:grid;gap:3px;font-size:12px;color:var(--lav-dim)}
+.prules .ok{color:var(--cyan)}
+.prules .bad{color:var(--danger)}
+@media(max-width:760px){.acc-grid{grid-template-columns:1fr}}
+
+/* Menú de cuenta */
+.umenu{position:relative}
+.umenu>button{display:flex;align-items:center;gap:8px}
+.umenu .av{width:30px;height:30px}
+.umenu ul{position:absolute;right:0;top:calc(100% + 8px);min-width:200px;list-style:none;padding:6px;margin:0;background:var(--ink-2);border:1px solid var(--line);border-radius:14px;box-shadow:0 20px 40px rgba(0,0,0,.4);display:grid;z-index:50;animation:rise .15s}
+.umenu li a,.umenu li button{display:block;width:100%;text-align:left;padding:10px 12px;border-radius:10px;font-size:14px}
+.umenu li a:hover,.umenu li button:hover{background:rgba(236,233,255,.08)}
+.umenu li.sep{border-top:1px solid var(--line);margin:4px 0}

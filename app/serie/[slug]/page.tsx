@@ -5,6 +5,8 @@ import { posterProps } from "@/lib/tone";
 import { FREE_EPISODES } from "@/lib/access";
 import SeriesCard from "@/components/SeriesCard";
 import ShareButton from "@/components/ShareButton";
+import MyListButton from "@/components/MyListButton";
+import { createClient } from "@/lib/supabase/server";
 import { Play } from "@/components/Icons";
 import SeriesTabs from "./SeriesTabs";
 import ReviewForm from "./ReviewForm";
@@ -21,6 +23,11 @@ export default async function SeriePage({ params }: { params: Promise<{ slug: st
   const recs = [...all.filter((x) => x.id !== s.id && x.genre === s.genre), ...all.filter((x) => x.id !== s.id && x.genre !== s.genre)].slice(0, 6);
   const p = posterProps(s);
   const total = episodeCount(s);
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const { data: saved } = user
+    ? await supabase.from("my_list").select("series_id").eq("user_id", user.id).eq("series_id", s.id).maybeSingle()
+    : { data: null };
 
   return (
     <>
@@ -35,12 +42,13 @@ export default async function SeriePage({ params }: { params: Promise<{ slug: st
             <h1>{s.title}</h1>
             <div className="facts">
               <div><b>{total}</b>episodios</div>
-              <div><b>{FREE_EPISODES}</b>gratis</div>
+              <div><b>{s.free_episodes ?? FREE_EPISODES}</b>gratis</div>
               <div><b>{avg ? `★ ${avg.toFixed(1)}` : "—"}</b>{reviews.length} reseñas</div>
               <div><b>{compact(likes)}</b>me gusta</div>
             </div>
             <div className="acts">
               <Link className="btn primary" href={`/ver/${s.slug}`} style={{ padding: "12px 30px" }}><Play />Ver ahora</Link>
+              <MyListButton seriesId={s.id} initial={!!saved} />
               <ShareButton title={s.title} path={`/serie/${s.slug}`} />
             </div>
           </div>

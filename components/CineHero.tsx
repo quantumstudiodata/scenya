@@ -11,12 +11,13 @@ export type DeckItem = {
   synopsis: string;
   genre: string;
   episodes: number;
+  free: number;
   className: string;
   style?: React.CSSProperties;
 };
 
 // Portada de inicio: texto a la izquierda y las portadas en baraja a la derecha.
-export default function CineHero({ items, free }: { items: DeckItem[]; free: number }) {
+export default function CineHero({ items }: { items: DeckItem[] }) {
   const router = useRouter();
   const [front, setFront] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -40,7 +41,7 @@ export default function CineHero({ items, free }: { items: DeckItem[]; free: num
       <div className={`bg ${cur.className}`} style={cur.style} />
       <div className="wrap">
         <div className="copy" key={cur.slug}>
-          <span className="meta">{cur.genre} · {cur.episodes} episodios · {free} gratis</span>
+          <span className="meta">{cur.genre} · {cur.episodes} episodios · {cur.free} gratis</span>
           <h1>{cur.title}</h1>
           <p>{cur.synopsis}</p>
           <div className="ctas">

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { FREE_EPISODES, hasAccesoTotal } from "@/lib/access";
+import { hasAccesoTotal } from "@/lib/access";
 
 export default async function Planes() {
   const supabase = await createClient();
@@ -48,7 +48,7 @@ export default async function Planes() {
             </div></div>
           </div>
         )}
-        <p className="note">Pago seguro con Stripe · {FREE_EPISODES} episodios gratis por serie</p>
+        <p className="note">Pago seguro con Stripe · Primeros episodios gratis en cada serie</p>
       </section>
     </div>
   );

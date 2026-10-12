@@ -4,7 +4,6 @@ import ContinueWatching from "@/components/ContinueWatching";
 import SeriesCard from "@/components/SeriesCard";
 import { listSeries, episodeCount } from "@/lib/catalog";
 import { posterProps } from "@/lib/tone";
-import { FREE_EPISODES } from "@/lib/access";
 
 export default async function Home() {
   const series = await listSeries();
@@ -15,12 +14,13 @@ export default async function Home() {
     synopsis: s.synopsis,
     genre: s.genre,
     episodes: episodeCount(s),
+    free: s.free_episodes ?? 10,
     ...posterProps(s),
   }));
 
   return (
     <>
-      <CineHero items={deck} free={FREE_EPISODES} />
+      <CineHero items={deck} />
       <div className="wrap" style={{ paddingBottom: 30 }}>
         <ContinueWatching />
 

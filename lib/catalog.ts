@@ -8,6 +8,7 @@ export type Series = {
   genre: string;
   poster_url: string | null;
   is_featured: boolean;
+  free_episodes: number;
   episodes: { count: number }[];
 };
 
@@ -15,18 +16,22 @@ export type Episode = { id: string; number: number; title: string };
 
 export type Review = { id: string; author_name: string; rating: number; body: string; created_at: string };
 
-const FIELDS = "id, slug, title, synopsis, genre, poster_url, is_featured, episodes(count)";
+const FIELDS = "id, slug, title, synopsis, genre, poster_url, is_featured, free_episodes, episodes(count)";
+// Respaldo mientras no exista la columna free_episodes (migración 0003).
+const LEGACY = "id, slug, title, synopsis, genre, poster_url, is_featured, episodes(count)";
 
 export async function listSeries() {
   const supabase = await createClient();
-  const { data } = await supabase.from("series").select(FIELDS).order("created_at", { ascending: false });
-  return (data ?? []) as Series[];
+  let { data, error } = await supabase.from("series").select(FIELDS).order("created_at", { ascending: false });
+  if (error) ({ data } = (await supabase.from("series").select(LEGACY).order("created_at", { ascending: false })) as never);
+  return (data ?? []) as unknown as Series[];
 }
 
 export async function getSeries(slug: string) {
   const supabase = await createClient();
-  const { data } = await supabase.from("series").select(FIELDS).eq("slug", slug).maybeSingle();
-  return data as Series | null;
+  let { data, error } = await supabase.from("series").select(FIELDS).eq("slug", slug).maybeSingle();
+  if (error) ({ data } = (await supabase.from("series").select(LEGACY).eq("slug", slug).maybeSingle()) as never);
+  return data as unknown as Series | null;
 }
 
 export async function getEpisodes(seriesId: string) {

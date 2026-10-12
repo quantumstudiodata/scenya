@@ -28,7 +28,7 @@ export default async function Ver({
       series={{ slug: s.slug, title: s.title, synopsis: s.synopsis, poster: s.poster_url, className: p.className }}
       episodes={episodes}
       startEp={ep}
-      free={FREE_EPISODES}
+      free={s.free_episodes ?? FREE_EPISODES}
       initialSubscribed={subscribed}
       publishableKey={process.env.STRIPE_PUBLISHABLE_KEY ?? process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
     />
