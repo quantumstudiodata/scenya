@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { hasAccesoTotal } from "@/lib/access";
 import { getPriceId } from "@/lib/stripe";
+import { SaveGuestAccount, SetPassword } from "./AccountForms";
 
 export default async function Cuenta({ searchParams }: { searchParams: Promise<{ pago?: string }> }) {
   const supabase = await createClient();
@@ -31,7 +32,7 @@ export default async function Cuenta({ searchParams }: { searchParams: Promise<{
         {pago === "ok" && !subscribed && (
           <p className="msg">Recibimos tu pago. Tu acceso se activa en unos segundos; recarga la página.</p>
         )}
-        <p className="muted">{user.email}</p>
+        <p className="muted">{user.is_anonymous ? "Estás como invitado" : user.email}</p>
         {subscribed ? (
           <>
             <p className="msg">Acceso Total activo · {plan}{until ? ` · Renueva el ${until}` : ""}</p>
@@ -45,8 +46,25 @@ export default async function Cuenta({ searchParams }: { searchParams: Promise<{
             <Link className="btn primary block" href="/planes">Ver planes</Link>
           </>
         )}
+        {user.is_anonymous ? (
+          <>
+            <h2 style={{ fontSize: 20, marginTop: 8 }}>Guarda tu cuenta</h2>
+            <p className="muted" style={{ fontSize: 14 }}>
+              Como invitado, tu acceso vive solo en este navegador. Agrega tu correo para no perderlo
+              y poder entrar desde otro dispositivo.
+            </p>
+            <SaveGuestAccount />
+          </>
+        ) : (
+          <>
+            <h2 style={{ fontSize: 20, marginTop: 8 }}>Contraseña</h2>
+            <SetPassword />
+          </>
+        )}
         <form action="/auth/salir" method="POST">
-          <button className="btn ghost block">Cerrar sesión</button>
+          <button className="btn ghost block">
+            {user.is_anonymous ? "Salir (perderás tu acceso de invitado)" : "Cerrar sesión"}
+          </button>
         </form>
       </div>
     </div>

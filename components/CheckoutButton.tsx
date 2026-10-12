@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { createClient } from "@/lib/supabase/browser";
 
 export default function CheckoutButton({ plan, children }: { plan: "mensual" | "anual"; children: React.ReactNode }) {
   const [loading, setLoading] = useState(false);
@@ -9,14 +10,21 @@ export default function CheckoutButton({ plan, children }: { plan: "mensual" | "
   async function go() {
     setLoading(true);
     setError("");
-    const res = await fetch("/api/checkout", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ plan }),
-    });
+    const start = () =>
+      fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan }),
+      });
+    let res = await start();
     if (res.status === 401) {
-      window.location.href = "/entrar?next=/planes";
-      return;
+      // Sin sesión: entra como invitado y sigue al pago.
+      const { error } = await createClient().auth.signInAnonymously();
+      if (error) {
+        window.location.href = "/entrar?next=/planes";
+        return;
+      }
+      res = await start();
     }
     const data = await res.json().catch(() => ({}));
     if (data.url) {

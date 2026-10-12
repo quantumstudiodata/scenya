@@ -51,7 +51,7 @@ export default async function SeriePage({
             <div className="locked">
               <span style={{ fontSize: 40 }}>🔒</span>
               <b>Episodio {current} bloqueado</b>
-              <Link className="btn primary" href={user ? "/planes" : `/entrar?next=${encodeURIComponent(`/serie/${s.slug}?ep=${current}`)}`}>
+              <Link className="btn primary" href="/planes">
                 Desbloquear todo
               </Link>
             </div>

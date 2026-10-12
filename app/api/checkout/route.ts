@@ -18,8 +18,10 @@ export async function POST(request: NextRequest) {
     .eq("user_id", user.id)
     .maybeSingle();
 
+  // Invitados sin correo: Stripe pide el correo en el pago y crea el cliente;
+  // el webhook lo liga al usuario con subscription_data.metadata.
   let customerId = existing?.stripe_customer_id as string | undefined;
-  if (!customerId) {
+  if (!customerId && user.email) {
     const customer = await stripe.customers.create({ email: user.email, metadata: { user_id: user.id } });
     customerId = customer.id;
     await admin.from("subscriptions").upsert({ user_id: user.id, stripe_customer_id: customerId });
@@ -29,7 +31,7 @@ export async function POST(request: NextRequest) {
   try {
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
-      customer: customerId,
+      ...(customerId ? { customer: customerId } : {}),
       client_reference_id: user.id,
       line_items: [{ price: await getPriceId(plan), quantity: 1 }],
       subscription_data: { metadata: { user_id: user.id } },

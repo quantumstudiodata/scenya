@@ -32,7 +32,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             </ul>
             <div className="sp" />
             {user ? (
-              <Link className="btn ghost" href="/cuenta">Mi cuenta</Link>
+              <Link className="btn ghost" href="/cuenta">{user.is_anonymous ? "Invitado" : "Mi cuenta"}</Link>
             ) : (
               <Link className="btn ghost" href="/entrar">Entrar</Link>
             )}
