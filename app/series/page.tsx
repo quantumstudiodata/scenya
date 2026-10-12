@@ -8,7 +8,7 @@ export default async function SeriesPage() {
       <section>
         <div className="head"><h2>Todas las series</h2></div>
         <div className="grid">
-          {series.map((s, i) => <SeriesCard key={s.id} s={s} i={i} />)}
+          {series.map((s) => <SeriesCard key={s.id} s={s} />)}
         </div>
       </section>
     </div>

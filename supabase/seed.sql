@@ -13,3 +13,9 @@ select s.id, n, 'Episodio ' || n, 90 from public.series s, generate_series(1, 30
 insert into public.episode_videos (episode_id, video_url)
 select e.id, 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4'
 from public.episodes e;
+
+-- Reseñas de ejemplo (requieren un usuario: usa el primero que exista, si hay).
+insert into public.reviews (series_id, user_id, author_name, rating, body)
+select s.id, u.id, 'Invitado 4821', 5, 'Me vi todos los episodios en una noche. No pude parar.'
+from public.series s cross join (select id from auth.users limit 1) u
+on conflict do nothing;

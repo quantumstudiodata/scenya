@@ -1,101 +1,87 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getSeries, episodeCount } from "@/lib/catalog";
-import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
-import { FREE_EPISODES, hasAccesoTotal } from "@/lib/access";
+import { getSeries, getReviews, seriesLikes, listSeries, episodeCount, compact } from "@/lib/catalog";
+import { posterProps } from "@/lib/tone";
+import { FREE_EPISODES } from "@/lib/access";
+import SeriesCard from "@/components/SeriesCard";
+import ShareButton from "@/components/ShareButton";
+import { Play } from "@/components/Icons";
+import SeriesTabs from "./SeriesTabs";
+import ReviewForm from "./ReviewForm";
 
-export default async function SeriePage({
-  params,
-  searchParams,
-}: {
-  params: Promise<{ slug: string }>;
-  searchParams: Promise<{ ep?: string }>;
-}) {
+const stars = (n: number) => "★★★★★".slice(0, Math.round(n)) + "☆☆☆☆☆".slice(0, 5 - Math.round(n));
+const initials = (name: string) => name.split(" ").map((w) => w[0]).join("").slice(0, 2) + name.slice(-1);
+
+export default async function SeriePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const s = await getSeries(slug);
   if (!s) notFound();
 
+  const [{ reviews, avg }, likes, all] = await Promise.all([getReviews(s.id), seriesLikes(s.id), listSeries()]);
+  const recs = [...all.filter((x) => x.id !== s.id && x.genre === s.genre), ...all.filter((x) => x.id !== s.id && x.genre !== s.genre)].slice(0, 6);
+  const p = posterProps(s);
   const total = episodeCount(s);
-  const current = Math.min(Math.max(Number((await searchParams).ep) || 1, 1), Math.max(total, 1));
-
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  const subscribed = await hasAccesoTotal(user?.id);
-  const canWatch = current <= FREE_EPISODES || subscribed;
-
-  // La URL del video solo sale del servidor si el episodio está permitido.
-  let videoUrl: string | null = null;
-  if (canWatch) {
-    const { data } = await createAdminClient()
-      .from("episodes")
-      .select("episode_videos(video_url)")
-      .eq("series_id", s.id)
-      .eq("number", current)
-      .maybeSingle();
-    const v = data?.episode_videos as unknown as { video_url: string } | { video_url: string }[] | null;
-    videoUrl = (Array.isArray(v) ? v[0]?.video_url : v?.video_url) ?? null;
-  }
-
-  const next = current < total ? current + 1 : null;
 
   return (
-    <div className="wrap">
-      <div className="player">
-        <div className="screen">
-          {canWatch && videoUrl ? (
-            <video key={current} src={videoUrl} controls autoPlay playsInline />
-          ) : canWatch ? (
-            <p className="muted">Este episodio aún no tiene video.</p>
-          ) : (
-            <div className="locked">
-              <span style={{ fontSize: 40 }}>🔒</span>
-              <b>Episodio {current} bloqueado</b>
-              <Link className="btn primary" href="/planes">
-                Desbloquear todo
-              </Link>
+    <>
+      <header className="sh">
+        <div className={`bg ${p.className}`} style={p.style} />
+        <div className="wrap">
+          <Link href={`/ver/${s.slug}`} className={`cover ${p.className}`} style={p.style} aria-label={`Ver ${s.title}`}>
+            <span className="play"><Play /></span>
+          </Link>
+          <div>
+            <span className="chip">{s.genre} · {total} episodios{avg ? ` · ★ ${avg.toFixed(1)}` : ""}</span>
+            <h1>{s.title}</h1>
+            <div className="facts">
+              <div><b>{total}</b>episodios</div>
+              <div><b>{FREE_EPISODES}</b>gratis</div>
+              <div><b>{avg ? `★ ${avg.toFixed(1)}` : "—"}</b>{reviews.length} reseñas</div>
+              <div><b>{compact(likes)}</b>me gusta</div>
             </div>
-          )}
-        </div>
-
-        <div style={{ minWidth: 0 }}>
-          <span className="tag">{s.genre}</span>
-          <h1 style={{ fontSize: 32, margin: "12px 0 6px" }}>{s.title}</h1>
-          <p className="muted">{s.synopsis}</p>
-          <p className="muted" style={{ marginTop: 8 }}>
-            Episodio {current} de {total} · Los primeros {FREE_EPISODES} son gratis
-          </p>
-
-          <div className="eps">
-            {Array.from({ length: total }, (_, i) => i + 1).map((n) => {
-              const locked = n > FREE_EPISODES && !subscribed;
-              const cls = n === current ? "cur" : locked ? "lk" : "free";
-              return (
-                <Link key={n} className={`ep ${cls}`} href={`/serie/${s.slug}?ep=${n}`} aria-label={`Episodio ${n}${locked ? " (bloqueado)" : ""}`}>
-                  {locked ? `🔒${n}` : n}
-                </Link>
-              );
-            })}
+            <div className="acts">
+              <Link className="btn primary" href={`/ver/${s.slug}`} style={{ padding: "12px 30px" }}><Play />Ver ahora</Link>
+              <ShareButton title={s.title} path={`/serie/${s.slug}`} />
+            </div>
           </div>
-
-          {next && (
-            <div style={{ marginTop: 16 }}>
-              <Link className="btn ghost" href={`/serie/${s.slug}?ep=${next}`}>Siguiente episodio →</Link>
-            </div>
-          )}
-
-          {!subscribed && (
-            <div className="paywall">
-              <div>
-                <b>Sigue viendo sin límites</b>
-                <br />
-                <small className="muted">Acceso Total desde $99 MXN al mes.</small>
-              </div>
-              <Link className="btn primary" href="/planes">Ver planes</Link>
-            </div>
-          )}
         </div>
+      </header>
+
+      <div className="wrap">
+        <SeriesTabs reviews={reviews.length}>
+          <div data-pane="sinopsis resenas" data-on="true">
+            <div data-pane="sinopsis" data-on="true">
+              <h2 className="pane-title">Sinopsis</h2>
+              <p className="synopsis" style={{ marginTop: 4 }}>{s.synopsis}</p>
+            </div>
+            <div data-pane="resenas">
+              <h2>Reseñas de invitados</h2>
+              <ReviewForm seriesId={s.id} slug={s.slug} />
+              {reviews.length ? (
+                <div className="reviews">
+                  {reviews.map((r) => (
+                    <div className="review" key={r.id}>
+                      <header>
+                        <span className="who"><span className="av">{initials(r.author_name)}</span>{r.author_name}</span>
+                        <span className="stars">{stars(r.rating)}</span>
+                      </header>
+                      <p>{r.body}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="muted">Sé la primera persona en dejar una reseña.</p>
+              )}
+            </div>
+          </div>
+          <div data-pane="similares">
+            <h2 className="pane-title">Otras recomendaciones</h2>
+            <div className="recs">
+              {recs.map((r) => <SeriesCard key={r.id} s={r} />)}
+            </div>
+          </div>
+        </SeriesTabs>
       </div>
-    </div>
+    </>
   );
 }

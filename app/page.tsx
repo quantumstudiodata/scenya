@@ -1,55 +1,51 @@
 import Link from "next/link";
-import SeriesCard, { posterStyle } from "@/components/SeriesCard";
+import CineHero from "@/components/CineHero";
+import ContinueWatching from "@/components/ContinueWatching";
+import SeriesCard from "@/components/SeriesCard";
 import { listSeries, episodeCount } from "@/lib/catalog";
+import { posterProps } from "@/lib/tone";
 import { FREE_EPISODES } from "@/lib/access";
 
 export default async function Home() {
   const series = await listSeries();
-  const featured = series.find((s) => s.is_featured) ?? series[0];
-  const fi = featured ? series.indexOf(featured) : 0;
-  const fp = featured ? posterStyle(featured, fi) : null;
+  const featured = [...series.filter((s) => s.is_featured), ...series.filter((s) => !s.is_featured)].slice(0, 5);
+  const deck = featured.map((s) => ({
+    slug: s.slug,
+    title: s.title,
+    synopsis: s.synopsis,
+    genre: s.genre,
+    episodes: episodeCount(s),
+    ...posterProps(s),
+  }));
 
   return (
-    <div className="wrap">
-      <header className="hero">
-        <div>
-          <span className="tag">Estrenos cada semana</span>
-          <h1>Historias que no puedes <em>dejar de ver</em></h1>
-          <p>Miniseries en episodios cortos. Una sola membresía abre todo el catálogo. Sin monedas, sin trucos.</p>
-          <div className="cta">
-            <Link className="btn primary" href="/planes">Empezar con Acceso Total</Link>
-            {featured && (
-              <Link className="btn ghost" href={`/serie/${featured.slug}`}>Ver gratis</Link>
-            )}
-          </div>
-          <div className="stats">
-            <div><b>{series.length}</b>series</div>
-            <div><b>{FREE_EPISODES}</b>episodios gratis por serie</div>
-            <div><b>0</b>monedas</div>
-          </div>
-        </div>
-        {featured && fp && (
-          <Link href={`/serie/${featured.slug}`} className={`feature ${fp.className}`} style={fp.style}>
-            <span className="badge">Tendencia</span>
-            <h2>{featured.title}</h2>
-            <small>{episodeCount(featured)} episodios · {featured.genre}</small>
-          </Link>
-        )}
-      </header>
+    <>
+      <CineHero items={deck} free={FREE_EPISODES} />
+      <div className="wrap" style={{ paddingBottom: 30 }}>
+        <ContinueWatching />
 
-      <section>
-        <div className="head">
-          <h2>Tendencias ahora</h2>
-          <Link className="muted" href="/series">Ver todo →</Link>
-        </div>
+        <div className="row-h"><h2>Top 10 en México hoy</h2></div>
         {series.length ? (
-          <div className="row">
-            {series.map((s, i) => <SeriesCard key={s.id} s={s} i={i} />)}
+          <div className="scroller top10">
+            {series.slice(0, 10).map((s, i) => {
+              const p = posterProps(s);
+              return (
+                <Link key={s.id} href={`/serie/${s.slug}`} className="t10">
+                  <em>{i + 1}</em>
+                  <div className={`poster ${p.className}`} style={p.style}><b>{s.title}</b></div>
+                </Link>
+              );
+            })}
           </div>
         ) : (
-          <p className="muted">Aún no hay series publicadas.</p>
+          <p className="empty">Aún no hay series publicadas.</p>
         )}
-      </section>
-    </div>
+
+        <div className="row-h"><h2>Todas las series</h2><Link href="/series">Ver todo →</Link></div>
+        <div className="scroller cols-poster">
+          {series.map((s) => <SeriesCard key={s.id} s={s} />)}
+        </div>
+      </div>
+    </>
   );
 }

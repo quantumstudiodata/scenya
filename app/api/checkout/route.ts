@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Inicia sesión primero." }, { status: 401 });
 
-  const { plan } = (await request.json().catch(() => ({}))) as { plan?: PlanKey };
+  const { plan, inline } = (await request.json().catch(() => ({}))) as { plan?: PlanKey; inline?: boolean };
   if (!plan || !(plan in PLANS)) return NextResponse.json({ error: "Plan no válido." }, { status: 400 });
 
   const admin = createAdminClient();
@@ -37,9 +37,12 @@ export async function POST(request: NextRequest) {
       subscription_data: { metadata: { user_id: user.id } },
       locale: "es",
       ui_mode: "embedded_page",
-      return_url: `${site}/cuenta?pago={CHECKOUT_SESSION_ID}`,
+      // inline: el pago vive en una ventana sobre el video y no redirige al terminar.
+      ...(inline
+        ? { redirect_on_completion: "never" as const }
+        : { return_url: `${site}/cuenta?pago={CHECKOUT_SESSION_ID}` }),
     });
-    return NextResponse.json({ clientSecret: session.client_secret });
+    return NextResponse.json({ clientSecret: session.client_secret, sessionId: session.id });
   } catch (err) {
     console.error("checkout", err);
     return NextResponse.json({ error: "No se pudo iniciar el pago. Intenta de nuevo." }, { status: 500 });
