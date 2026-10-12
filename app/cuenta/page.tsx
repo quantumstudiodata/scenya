@@ -3,7 +3,8 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { hasAccesoTotal } from "@/lib/access";
-import { getPriceId } from "@/lib/stripe";
+import { getPriceId, stripe } from "@/lib/stripe";
+import { syncSubscription } from "@/lib/subscriptions";
 import { SaveGuestAccount, SetPassword } from "./AccountForms";
 
 export default async function Cuenta({ searchParams }: { searchParams: Promise<{ pago?: string }> }) {
@@ -12,6 +13,18 @@ export default async function Cuenta({ searchParams }: { searchParams: Promise<{
   if (!user) redirect("/entrar?next=/cuenta");
 
   const { pago } = await searchParams;
+  // Al volver del pago, activa el acceso de inmediato sin esperar al webhook.
+  if (pago?.startsWith("cs_")) {
+    try {
+      const session = await stripe.checkout.sessions.retrieve(pago);
+      if (session.client_reference_id === user.id && session.subscription) {
+        const id = typeof session.subscription === "string" ? session.subscription : session.subscription.id;
+        await syncSubscription(await stripe.subscriptions.retrieve(id), user.id);
+      }
+    } catch (err) {
+      console.error("cuenta: no se pudo sincronizar el pago", err);
+    }
+  }
   const subscribed = await hasAccesoTotal(user.id);
   const { data: sub } = await createAdminClient()
     .from("subscriptions")
@@ -29,7 +42,10 @@ export default async function Cuenta({ searchParams }: { searchParams: Promise<{
     <div className="wrap">
       <div className="panel">
         <h1>Mi cuenta</h1>
-        {pago === "ok" && !subscribed && (
+        {pago && subscribed && (
+          <p className="msg">¡Listo! Ya tienes Acceso Total. Disfruta todo el catálogo.</p>
+        )}
+        {pago && !subscribed && (
           <p className="msg">Recibimos tu pago. Tu acceso se activa en unos segundos; recarga la página.</p>
         )}
         <p className="muted">{user.is_anonymous ? "Estás como invitado" : user.email}</p>

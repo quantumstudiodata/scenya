@@ -1,5 +1,4 @@
 import Link from "next/link";
-import CheckoutButton from "@/components/CheckoutButton";
 import { createClient } from "@/lib/supabase/server";
 import { FREE_EPISODES, hasAccesoTotal } from "@/lib/access";
 
@@ -33,7 +32,7 @@ export default async function Planes() {
                 <li>Sin monedas ni recompensas</li>
                 <li>Cancela cuando quieras</li>
               </ul>
-              <CheckoutButton plan="mensual">Suscribirme</CheckoutButton>
+              <Link className="btn primary block" href="/pagar?plan=mensual">Suscribirme</Link>
             </div></div>
             <div className="plan"><div>
               <span className="tag">Pase anual</span>
@@ -45,7 +44,7 @@ export default async function Planes() {
                 <li>Un solo pago al año</li>
                 <li>Cancela cuando quieras</li>
               </ul>
-              <CheckoutButton plan="anual">Obtener pase anual</CheckoutButton>
+              <Link className="btn primary block" href="/pagar?plan=anual">Obtener pase anual</Link>
             </div></div>
           </div>
         )}

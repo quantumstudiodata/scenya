@@ -98,3 +98,11 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
   .screen{max-width:320px;margin:auto}
 }
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+
+.pay{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:32px;align-items:start;padding-block:40px}
+.pay aside{display:grid;gap:10px;justify-items:start;position:sticky;top:96px}
+.pay aside h1{font-size:32px}
+.pay aside ul{list-style:none;padding:0;display:grid;gap:8px;margin:8px 0}
+.pay aside li::before{content:"✦";color:var(--a2);margin-right:10px}
+.checkout{background:#fff;border-radius:24px;padding:8px;min-height:480px;box-shadow:0 0 60px rgba(124,92,255,.35);min-width:0}
+@media(max-width:860px){.pay{grid-template-columns:1fr}.pay aside{position:static}}

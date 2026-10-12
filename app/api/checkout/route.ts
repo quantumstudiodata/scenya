@@ -36,10 +36,10 @@ export async function POST(request: NextRequest) {
       line_items: [{ price: await getPriceId(plan), quantity: 1 }],
       subscription_data: { metadata: { user_id: user.id } },
       locale: "es",
-      success_url: `${site}/cuenta?pago=ok`,
-      cancel_url: `${site}/planes`,
+      ui_mode: "embedded_page",
+      return_url: `${site}/cuenta?pago={CHECKOUT_SESSION_ID}`,
     });
-    return NextResponse.json({ url: session.url });
+    return NextResponse.json({ clientSecret: session.client_secret });
   } catch (err) {
     console.error("checkout", err);
     return NextResponse.json({ error: "No se pudo iniciar el pago. Intenta de nuevo." }, { status: 500 });
