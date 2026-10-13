@@ -8,6 +8,7 @@
   --violet:#7c5cff;--cyan:#35e0ff;--pink:#ff4fd8;--gold:#ffcf5c;--danger:#ff6b8a;
   --display:"Sora",system-ui,sans-serif;--body:"Inter",system-ui,sans-serif;color-scheme:dark}
 *{box-sizing:border-box;margin:0}
+[hidden]{display:none!important}
 body{background:var(--ink);color:var(--lav);font:14px/1.5 var(--body);padding-inline:16px;padding-block:20px 60px}
 h1,h2,h3{font-family:var(--display);text-wrap:balance}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
@@ -84,15 +85,21 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .acc-head{display:flex;align-items:center;gap:14px;margin-bottom:18px}
 .acc-head .av{width:56px;height:56px;font-size:22px}
 .acc-head h1{font-size:28px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;max-width:720px}
 .card{background:var(--ink-2);border:1px solid var(--line);border-radius:20px;padding:18px;display:grid;gap:12px;align-content:start}
 .card h2{font-size:17px}
 .pill{justify-self:start;font-size:12px;font-weight:600;padding:4px 12px;border-radius:99px;background:rgba(53,224,255,.14);color:var(--cyan)}
 .kv{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:13px}
 .kv dt{color:var(--dim)}.kv dd{margin:0}
-.rules{display:grid;gap:3px;font-size:12px;color:var(--cyan);list-style:none;padding:0}
-.rules .bad{color:var(--danger)}
-.mini{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.rules{list-style:none;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.rules li{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;padding:4px 10px 4px 5px;border-radius:99px;background:rgba(53,224,255,.12);border:1px solid rgba(53,224,255,.35);color:var(--cyan)}
+.rules .dot{width:16px;height:16px;border-radius:50%;display:grid;place-items:center;font-size:10px;font-weight:700;background:var(--cyan);color:var(--ink)}
+.rules li.bad{background:rgba(255,107,138,.1);border-color:rgba(255,107,138,.35);color:var(--danger)}
+.rules li.bad .dot{background:var(--danger)}
+.ibtn{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:rgba(236,233,255,.08);color:var(--dim);flex:none}
+.ibtn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.row:hover .ibtn{background:var(--cyan);color:var(--ink)}
+.mini{display:grid;grid-template-columns:repeat(auto-fill,72px);gap:8px}
 .mini div{aspect-ratio:2/3;border-radius:10px}
 
 /* Ventana emergente */
@@ -141,13 +148,13 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
           <div class="stat"><b>$13,450</b><span>MXN este mes</span></div>
         </div>
         <div class="list">
-          <div class="row"><span class="thumb t2"></span><span class="info"><b>El Contrato de los Siete Días</b><small>Romance · 5 episodios · 3 gratis</small></span><span class="chip">★ Destacada</span><span style="color:var(--dim)">Editar →</span></div>
-          <div class="row"><span class="thumb t1"></span><span class="info"><b>El Heredero Oculto</b><small>Romance · 30 episodios · 10 gratis</small></span><span style="color:var(--dim)">Editar →</span></div>
-          <div class="row"><span class="thumb t3"></span><span class="info"><b>Luna de Sangre</b><small>Fantasía · 13 episodios · 10 gratis</small></span><span style="color:var(--dim)">Editar →</span></div>
+          <div class="row"><span class="thumb t2"></span><span class="info"><b>El Contrato de los Siete Días</b><small>Romance · 5 episodios · 3 gratis</small></span><span class="chip">★ Destacada</span><span class="ibtn" aria-label="Editar"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4zM13.5 6.5l4 4"/></svg></span></div>
+          <div class="row"><span class="thumb t1"></span><span class="info"><b>El Heredero Oculto</b><small>Romance · 30 episodios · 10 gratis</small></span><span class="ibtn" aria-label="Editar"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4zM13.5 6.5l4 4"/></svg></span></div>
+          <div class="row"><span class="thumb t3"></span><span class="info"><b>Luna de Sangre</b><small>Fantasía · 13 episodios · 10 gratis</small></span><span class="ibtn" aria-label="Editar"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4zM13.5 6.5l4 4"/></svg></span></div>
         </div>
       </div>
     </div></div>
-    <p class="note" style="margin-top:10px">Los números del resumen son de ejemplo. Los de suscriptores e ingresos se pueden agregar como siguiente paso.</p>
+    <p class="note" style="margin-top:10px">En la página real el resumen usa tus datos: series, episodios, suscriptores activos y lo cobrado en Stripe este mes.</p>
   </section>
 
   <!-- EDITAR -->
@@ -224,7 +231,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
             <h2>Contraseña</h2>
             <div class="f">Contraseña actual<div class="in">••••••••</div></div>
             <div class="f">Nueva contraseña<div class="in">••••••</div></div>
-            <ul class="rules"><li class="bad">• Entre 8 y 64 caracteres</li><li>✓ Al menos una letra</li><li>✓ Al menos un número</li><li>✓ Solo letras, números y ! @ # $ % &amp; * . _ - ? +</li></ul>
+            <ul class="rules"><li class="bad"><span class="dot">✕</span>8 a 64 caracteres</li><li><span class="dot">✓</span>Una letra</li><li><span class="dot">✓</span>Un número</li><li><span class="dot">✓</span>Símbolos permitidos: ! @ # $ % &amp; * . _ - ? +</li></ul>
             <div class="f">Confirma la nueva contraseña<div class="in">&nbsp;</div></div>
             <span class="btn soft">Cambiar contraseña</span>
           </div>

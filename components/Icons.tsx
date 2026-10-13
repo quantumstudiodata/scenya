@@ -17,3 +17,4 @@ export const Lock = s(<><rect x="5" y="11" width="14" height="10" rx="2" /><path
 export const Check = s(<path d="M5 12l5 5 9-10" />);
 export const Send = s(<path d="m22 2-7 20-4-9-9-4z" />);
 export const Bookmark = s(<path d="M6 3h12v18l-6-4-6 4z" />);
+export const Pencil = s(<path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4zM13.5 6.5l4 4" />);
