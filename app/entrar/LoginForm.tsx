@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/browser";
 import { safeNext } from "@/lib/safe-next";
@@ -11,14 +11,23 @@ type Mode = "entrar" | "registro" | "recuperar";
 
 export default function LoginForm() {
   const router = useRouter();
-  const next = safeNext(useSearchParams().get("next"));
-  const [mode, setMode] = useState<Mode>("entrar");
+  const params = useSearchParams();
+  const next = safeNext(params.get("next"));
+  // El modo vive en la URL: así el botón "Entrar" de arriba siempre regresa a iniciar sesión.
+  const m = params.get("modo");
+  const mode: Mode = m === "registro" || m === "recuperar" ? m : "entrar";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState<{ text: string; err?: boolean } | null>(null);
-  const go = (m: Mode) => { setMode(m); setMsg(null); setPassword(""); setConfirm(""); };
+  const go = (to: Mode) => {
+    const q = new URLSearchParams(params.toString());
+    if (to === "entrar") q.delete("modo"); else q.set("modo", to);
+    setMsg(null); setPassword(""); setConfirm("");
+    router.replace(`/entrar${q.toString() ? `?${q}` : ""}`, { scroll: false });
+  };
+  useEffect(() => { setMsg(null); setPassword(""); setConfirm(""); }, [mode]);
 
   async function guest() {
     setLoading(true);

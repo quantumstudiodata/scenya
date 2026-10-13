@@ -370,3 +370,10 @@ select option{background:var(--ink-2)}
 .umenu li a,.umenu li button{display:block;width:100%;text-align:left;padding:10px 12px;border-radius:10px;font-size:14px}
 .umenu li a:hover,.umenu li button:hover{background:rgba(236,233,255,.08)}
 .umenu li.sep{border-top:1px solid var(--line);margin:4px 0}
+.mopts{display:grid;gap:8px}
+.mopts form{display:contents}
+.mopt{display:grid;gap:2px;text-align:left;width:100%;padding:14px 16px;border-radius:14px;border:1px solid var(--line);background:rgba(236,233,255,.04);transition:border-color .2s,background .2s}
+.mopt:hover{border-color:var(--cyan);background:rgba(53,224,255,.06)}
+.mopt b{font:700 15px var(--display)}
+.mopt small{color:var(--lav-dim);font-size:13px}
+.mopt.danger b{color:var(--danger)}

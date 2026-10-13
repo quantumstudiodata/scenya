@@ -7,6 +7,7 @@ import { isAdmin } from "@/lib/admin";
 import { getPriceId, stripe } from "@/lib/stripe";
 import { syncSubscription } from "@/lib/subscriptions";
 import { SaveGuestAccount, ChangeEmail, ChangePassword } from "./AccountForms";
+import MembershipModal from "./MembershipModal";
 
 export const dynamic = "force-dynamic";
 
@@ -31,7 +32,7 @@ export default async function Cuenta({ searchParams }: { searchParams: Promise<{
   const subscribed = await hasAccesoTotal(user.id);
   const { data: sub } = await createAdminClient()
     .from("subscriptions")
-    .select("price_id, status, current_period_end, stripe_customer_id")
+    .select("price_id, status, current_period_end, stripe_customer_id, stripe_subscription_id")
     .eq("user_id", user.id)
     .maybeSingle();
 
@@ -40,6 +41,12 @@ export default async function Cuenta({ searchParams }: { searchParams: Promise<{
   const until = sub?.current_period_end
     ? new Date(sub.current_period_end).toLocaleDateString("es-MX", { dateStyle: "long" })
     : null;
+  let canceling = false;
+  if (subscribed && sub?.stripe_subscription_id) {
+    const live = await stripe.subscriptions.retrieve(sub.stripe_subscription_id).catch(() => null);
+    canceling = !!(live?.cancel_at_period_end || live?.cancel_at);
+  }
+  const planKey = sub?.price_id && sub.price_id === yearly ? "anual" : "mensual";
   const guest = !!user.is_anonymous;
   const needsPassword = !!user.user_metadata?.needs_password;
 
@@ -63,15 +70,12 @@ export default async function Cuenta({ searchParams }: { searchParams: Promise<{
           <h2>Membresía</h2>
           {subscribed ? (
             <>
-              <p className="pill ok">Acceso Total activo</p>
+              <p className={`pill${canceling ? "" : " ok"}`}>{canceling ? "Se cancela al terminar el periodo" : "Acceso Total activo"}</p>
               <dl className="kv">
                 <dt>Plan</dt><dd>{plan}</dd>
-                {until && <><dt>Próxima renovación</dt><dd>{until}</dd></>}
+                {until && <><dt>{canceling ? "Acceso hasta" : "Próxima renovación"}</dt><dd>{until}</dd></>}
               </dl>
-              <form action="/api/portal" method="POST">
-                <button className="btn soft block">Administrar membresía</button>
-              </form>
-              <p className="muted small">Cambia de plan, actualiza tu tarjeta, descarga facturas o cancela.</p>
+              <MembershipModal plan={planKey} until={until} canceling={canceling} />
             </>
           ) : (
             <>

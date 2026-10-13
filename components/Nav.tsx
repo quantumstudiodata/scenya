@@ -52,7 +52,6 @@ export default function Nav({ user }: { user: NavUser }) {
               <ul role="menu">
                 <li><Link href="/cuenta" role="menuitem">Mi cuenta</Link></li>
                 <li><Link href="/mi-lista" role="menuitem">Mis listas</Link></li>
-                <li><Link href="/planes" role="menuitem">Membresía</Link></li>
                 {user.admin && <li><Link href="/admin" role="menuitem">Panel de administrador</Link></li>}
                 <li className="sep" />
                 <li>
