@@ -4,7 +4,7 @@ import { requireAdmin } from "@/lib/admin";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { posterProps } from "@/lib/tone";
 import { stripe } from "@/lib/stripe";
-import { Pencil } from "@/components/Icons";
+import SeriesList from "./SeriesList";
 
 export const dynamic = "force-dynamic";
 
@@ -34,27 +34,19 @@ export default async function Admin() {
         <div className="astat"><b>{series.length}</b><span>series publicadas</span></div>
         <div className="astat"><b>{episodes ?? 0}</b><span>episodios</span></div>
         <div className="astat"><b>{subscribers ?? 0}</b><span>suscriptores activos</span></div>
-        <div className="astat"><b>{money(revenue)}</b><span>ingresos de este mes</span></div>
+        <Link href="/admin/ingresos" className="astat link"><b>{money(revenue)}</b><span>ingresos de este mes · ver pagos →</span></Link>
       </div>
       {series.length === 0 ? (
         <p className="muted">Todavía no hay series. Crea la primera.</p>
       ) : (
-        <div className="alist">
-          {series.map((s) => {
-            const p = posterProps(s);
-            const eps = (s.episodes as unknown as { count: number }[])?.[0]?.count ?? 0;
-            return (
-              <Link key={s.id} href={`/admin/serie/${s.id}`} className="arow">
-                <span className={`athumb ${p.className}`} style={p.style} />
-                <span className="ainfo">
-                  <b>{s.title}</b>
-                  <small>{s.genre || "Sin género"} · {eps} episodios · {s.free_episodes} gratis{s.is_featured ? " · ★ Destacada" : ""}</small>
-                </span>
-                <span className="ibtn" aria-label="Editar"><Pencil /></span>
-              </Link>
-            );
-          })}
-        </div>
+        <SeriesList rows={series.map((s) => {
+          const p = posterProps(s);
+          return {
+            id: s.id, title: s.title, genre: s.genre ?? "", free: s.free_episodes, featured: !!s.is_featured,
+            eps: (s.episodes as unknown as { count: number }[])?.[0]?.count ?? 0,
+            thumbClass: p.className, thumbStyle: p.style,
+          };
+        })} />
       )}
     </div>
   );

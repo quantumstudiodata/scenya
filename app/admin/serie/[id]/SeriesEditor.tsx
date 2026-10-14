@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/browser";
 import { slugify } from "@/lib/slug";
+import { preparePoster } from "@/lib/poster-image";
+import VideoSplitter from "./VideoSplitter";
 
 export type AdminSeries = {
   id: string; slug: string; title: string; genre: string; synopsis: string;
@@ -38,6 +40,9 @@ export default function SeriesEditor({ series, episodes: initial }: { series: Ad
   const [msg, setMsg] = useState<{ text: string; err?: boolean } | null>(null);
   const [busy, setBusy] = useState("");
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [splitter, setSplitter] = useState(false);
+  // En series nuevas el enlace sigue al título hasta que se edita a mano.
+  const [slugAuto, setSlugAuto] = useState(!series);
   const bulk = useRef<HTMLInputElement>(null);
   const set = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) => setForm((f) => ({ ...f, [k]: v }));
   const say = (text: string, err = false) => setMsg({ text, err });
@@ -45,7 +50,7 @@ export default function SeriesEditor({ series, episodes: initial }: { series: Ad
   async function savePoster(file: File) {
     setBusy("Subiendo portada…");
     try {
-      const { publicUrl } = await upload("poster", file);
+      const { publicUrl } = await upload("poster", await preparePoster(file));
       set("poster_url", publicUrl);
       say("Portada lista. Guarda los cambios para publicarla.");
     } catch (e) { say((e as Error).message, true); }
@@ -146,10 +151,14 @@ export default function SeriesEditor({ series, episodes: initial }: { series: Ad
 
         <div className="afields">
           <label htmlFor="s-title">Título
-            <input id="s-title" value={form.title} onChange={(e) => set("title", e.target.value)} placeholder="El Contrato de los Siete Días" />
+            <input id="s-title" value={form.title} onChange={(e) => { set("title", e.target.value); if (slugAuto) set("slug", slugify(e.target.value)); }} placeholder="El Contrato de los Siete Días" />
           </label>
           <label htmlFor="s-slug">Enlace (slug)
-            <input id="s-slug" value={form.slug} onChange={(e) => set("slug", slugify(e.target.value))} placeholder={slugify(form.title) || "el-contrato-de-los-siete-dias"} />
+            <input id="s-slug" value={form.slug} onChange={(e) => { setSlugAuto(false); set("slug", slugify(e.target.value)); }} placeholder={slugify(form.title) || "el-contrato-de-los-siete-dias"} />
+            <small className="muted">
+              {slugAuto ? "Se genera solo con el título. " : ""}scenya.vercel.app/serie/{form.slug || slugify(form.title) || "…"}
+              {series && form.slug !== series.slug && " · Ojo: los enlaces viejos dejarán de funcionar."}
+            </small>
           </label>
           <div className="arow2">
             <label htmlFor="s-genre">Género
@@ -182,12 +191,22 @@ export default function SeriesEditor({ series, episodes: initial }: { series: Ad
         <section>
           <div className="head">
             <h2>Episodios ({episodes.length})</h2>
-            <label className="btn primary" htmlFor="bulk-videos">+ Agregar videos</label>
+            <div className="acts">
+              <button className="btn soft" onClick={() => setSplitter(true)} disabled={!!busy}>✂ Cortar video completo</button>
+              <label className="btn primary" htmlFor="bulk-videos">+ Agregar videos</label>
+            </div>
             <input ref={bulk} id="bulk-videos" type="file" accept="video/*" multiple hidden onChange={(e) => addVideos(e.target.files)} />
           </div>
           <p className="muted" style={{ fontSize: 13, marginBottom: 12 }}>
             Puedes elegir varios videos a la vez; se numeran en orden por nombre de archivo (ep01.mp4, ep02.mp4…). Máximo 50 MB por video en el plan gratis de Supabase.
           </p>
+          {splitter && (
+            <VideoSplitter
+              startNumber={Math.max(0, ...episodes.map((e) => e.number)) + 1}
+              onUpload={(n, title, file) => saveEpisode(n, title, file)}
+              onClose={(changed) => { setSplitter(false); if (changed) { say("Episodios generados y subidos."); router.refresh(); } }}
+            />
+          )}
           {episodes.length === 0 ? <p className="muted">Sin episodios todavía.</p> : (
             <div className="alist">
               {episodes.map((ep) => (
