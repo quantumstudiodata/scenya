@@ -38,13 +38,16 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   if (!(await requireAdmin())) return NextResponse.json({ error: "Solo administradores." }, { status: 403 });
-  const id = request.nextUrl.searchParams.get("id");
-  if (!id) return NextResponse.json({ error: "Falta id" }, { status: 400 });
+  // ?id=… borra uno; ?ids=a,b,c borra varios.
+  const sp = request.nextUrl.searchParams;
+  const ids = (sp.get("ids") ?? sp.get("id") ?? "").split(",").map((x) => x.trim()).filter(Boolean).slice(0, 500);
+  if (!ids.length) return NextResponse.json({ error: "Falta id" }, { status: 400 });
   const admin = createAdminClient();
-  const { data: v } = await admin.from("episode_videos").select("video_url").eq("episode_id", id).maybeSingle();
-  const { error } = await admin.from("episodes").delete().eq("id", id);
+  const { data: vids } = await admin.from("episode_videos").select("video_url").in("episode_id", ids);
+  const { error } = await admin.from("episodes").delete().in("id", ids);
   if (error) return NextResponse.json({ error: "No se pudo borrar." }, { status: 500 });
-  if (v?.video_url && !/^https?:\/\//.test(v.video_url)) await admin.storage.from("videos").remove([v.video_url]);
+  const files = (vids ?? []).map((v) => v.video_url).filter((u) => u && !/^https?:\/\//.test(u));
+  if (files.length) await admin.storage.from("videos").remove(files);
   revalidatePath("/", "layout");
   return NextResponse.json({ ok: true });
 }

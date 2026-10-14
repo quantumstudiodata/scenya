@@ -29,6 +29,8 @@ export default function SeriesEditor({ series, episodes: initial }: { series: Ad
   const [busy, setBusy] = useState("");
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [splitter, setSplitter] = useState(false);
+  const [picked, setPicked] = useState<string[]>([]);
+  const [confirmBulk, setConfirmBulk] = useState(false);
   // En series nuevas el enlace sigue al título hasta que se edita a mano.
   const [slugAuto, setSlugAuto] = useState(!series);
   const bulk = useRef<HTMLInputElement>(null);
@@ -106,6 +108,19 @@ export default function SeriesEditor({ series, episodes: initial }: { series: Ad
     setBusy("");
     if (!r.ok) return say("No se pudo borrar el episodio.", true);
     setEpisodes((l) => l.filter((e) => e.id !== ep.id));
+    setPicked((l) => l.filter((x) => x !== ep.id));
+  }
+
+  async function deletePicked() {
+    setConfirmBulk(false);
+    setBusy(`Borrando ${picked.length} episodio(s)…`);
+    const r = await fetch(`/api/admin/episodes?ids=${picked.join(",")}`, { method: "DELETE" });
+    setBusy("");
+    if (!r.ok) return say("No se pudieron borrar los episodios.", true);
+    setEpisodes((l) => l.filter((e) => !picked.includes(e.id)));
+    say(`${picked.length} episodio(s) borrado(s).`);
+    setPicked([]);
+    router.refresh();
   }
 
   async function deleteSeries() {
@@ -191,10 +206,34 @@ export default function SeriesEditor({ series, episodes: initial }: { series: Ad
               onClose={(changed) => { setSplitter(false); if (changed) { say("Episodios actualizados."); router.refresh(); } }}
             />
           )}
+          {episodes.length > 0 && (
+            <div className="acts pick-bar">
+              <label className="check">
+                <input type="checkbox" checked={picked.length === episodes.length}
+                  ref={(el) => { if (el) el.indeterminate = picked.length > 0 && picked.length < episodes.length; }}
+                  onChange={(e) => setPicked(e.target.checked ? episodes.map((x) => x.id) : [])} />
+                {picked.length ? `${picked.length} seleccionado(s)` : "Seleccionar todos"}
+              </label>
+              {picked.length > 0 && (confirmBulk ? (
+                <>
+                  <span className="muted">¿Borrar {picked.length} episodio(s) y sus videos? No se puede deshacer.</span>
+                  <button className="btn soft small danger" onClick={deletePicked} disabled={!!busy}>Sí, borrar</button>
+                  <button className="btn soft small" onClick={() => setConfirmBulk(false)}>Cancelar</button>
+                </>
+              ) : (
+                <>
+                  <button className="btn soft small danger" onClick={() => setConfirmBulk(true)} disabled={!!busy}>Borrar seleccionados</button>
+                  <button className="btn soft small" onClick={() => setPicked([])}>Quitar selección</button>
+                </>
+              ))}
+            </div>
+          )}
           {episodes.length === 0 ? <p className="muted">Sin episodios todavía.</p> : (
             <div className="alist">
               {episodes.map((ep) => (
-                <div key={ep.id} className="arow ep-row">
+                <div key={ep.id} className={`arow ep-row${picked.includes(ep.id) ? " picked" : ""}`}>
+                  <input type="checkbox" className="ep-pick" aria-label={`Seleccionar episodio ${ep.number}`} checked={picked.includes(ep.id)}
+                    onChange={(e) => setPicked((l) => (e.target.checked ? [...l, ep.id] : l.filter((x) => x !== ep.id)))} />
                   <b className={`epn ${ep.number > form.free_episodes ? "lockd" : ""}`}>{ep.number}</b>
                   <input aria-label={`Título del episodio ${ep.number}`} defaultValue={ep.title} onBlur={(e) => renameEpisode(ep, e.target.value)} />
                   <span className={`vstat ${ep.hasVideo ? "ok" : ""}`}>{ep.hasVideo ? "Video ✓" : "Sin video"}</span>
