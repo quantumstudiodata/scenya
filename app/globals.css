@@ -150,7 +150,7 @@ textarea{resize:vertical;min-height:70px}
 .stage{position:relative;display:flex;justify-content:center;align-items:center;gap:18px;overflow:hidden;min-width:0}
 .stage .bg{position:absolute;inset:-80px;filter:blur(60px);opacity:.45;transition:background .5s}
 .vframe{position:relative;height:min(92vh,880px);aspect-ratio:9/16;max-width:100%;border-radius:18px;overflow:hidden;z-index:1;background:#000;box-shadow:0 20px 60px rgba(0,0,0,.6)}
-.vframe video{width:100%;height:100%;object-fit:cover;display:block}
+.vframe video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 .vframe .shade{position:absolute;inset:0;pointer-events:none;background:linear-gradient(rgba(8,1,48,.45),transparent 20%,transparent 60%,rgba(8,1,48,.88))}
 .vframe .poster-fill{position:absolute;inset:0}
 .vframe .lockview{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px;background:rgba(8,1,48,.55);backdrop-filter:blur(14px)}
