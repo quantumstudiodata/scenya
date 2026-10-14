@@ -161,8 +161,16 @@ textarea{resize:vertical;min-height:70px}
 .vinfo{position:absolute;left:14px;right:70px;bottom:22px;z-index:2;pointer-events:none}
 .vinfo b{font:700 16px var(--display);display:block}
 .vinfo span{font-size:13px;color:var(--lav-dim);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.vbar{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(236,233,255,.2);z-index:2}
-.vbar i{display:block;height:100%;background:var(--lav);width:0}
+.vbar{position:absolute;left:0;right:0;bottom:0;height:22px;z-index:4;cursor:pointer;touch-action:none;display:flex;align-items:flex-end}
+.vbar .track{position:relative;width:100%;height:3px;background:rgba(236,233,255,.25);transition:height .15s}
+.vbar .track i{display:block;height:100%;background:var(--lav);width:0}
+.vbar .track b{position:absolute;top:50%;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:#fff;box-shadow:0 0 8px rgba(0,0,0,.5);opacity:0;transition:opacity .15s}
+.vbar:hover .track,.vbar.on .track{height:6px}
+.vbar:hover .track b,.vbar.on .track b{opacity:1}
+.vbar .scrubtime{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);font:700 22px var(--display);text-shadow:0 2px 12px rgba(0,0,0,.8);white-space:nowrap;pointer-events:none;font-variant-numeric:tabular-nums}
+.skipfx{position:absolute;top:50%;transform:translateY(-50%);z-index:3;pointer-events:none;font:700 15px var(--body);padding:12px 18px;border-radius:99px;background:rgba(8,1,48,.55);backdrop-filter:blur(6px);animation:pop .25s}
+.skipfx.back{left:14%}
+.skipfx.fwd{right:14%}
 .vtop{position:absolute;top:16px;left:18px;right:18px;z-index:5;display:flex;align-items:center;gap:12px;font-size:13px}
 .vtop b{font-family:var(--display)}
 .round{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:rgba(8,1,48,.55);backdrop-filter:blur(8px);flex:none}

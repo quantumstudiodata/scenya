@@ -42,6 +42,9 @@ export default function Player({
   const [paused, setPaused] = useState(false);
   const [muted, setMuted] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [scrub, setScrub] = useState<number | null>(null); // 0–1 mientras se arrastra la barra
+  const [skipFx, setSkipFx] = useState<{ dir: -1 | 1; n: number } | null>(null);
+  const tapTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [sideOpen, setSideOpen] = useState(false);
   const [sideTab, setSideTab] = useState<"eps" | "comments">("eps");
   const [range, setRange] = useState(Math.floor((startEp - 1) / RANGE));
@@ -107,11 +110,52 @@ export default function Player({
       if (e.key === "ArrowDown") { e.preventDefault(); go(cur + 1); }
       if (e.key === "ArrowUp") { e.preventDefault(); go(cur - 1); }
       if (e.key === " ") { e.preventDefault(); setPaused((p) => !p); }
+      if (e.key === "ArrowRight") { e.preventDefault(); skip(5); }
+      if (e.key === "ArrowLeft") { e.preventDefault(); skip(-5); }
       if (e.key === "Escape") setSideOpen(false);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [go, cur, modal]);
+
+  // Adelantar / regresar
+  function skip(sec: number) {
+    const v = video.current;
+    if (!v || !v.duration) return;
+    v.currentTime = Math.max(0, Math.min(v.duration - 0.1, v.currentTime + sec));
+    setProgress((v.currentTime / v.duration) * 100);
+    const dir = sec > 0 ? 1 : -1;
+    setSkipFx((f) => ({ dir, n: f?.dir === dir ? f.n + 1 : 1 }));
+  }
+  useEffect(() => {
+    if (!skipFx) return;
+    const id = setTimeout(() => setSkipFx(null), 650);
+    return () => clearTimeout(id);
+  }, [skipFx]);
+
+  // Un toque pausa; doble toque en la orilla izquierda/derecha regresa/adelanta 5 s.
+  function onVideoTap(e: React.MouseEvent<HTMLVideoElement>) {
+    const r = e.currentTarget.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width;
+    if (tapTimer.current) {
+      clearTimeout(tapTimer.current); tapTimer.current = null;
+      if (x < 0.4) skip(-5); else if (x > 0.6) skip(5); else setPaused((p) => !p);
+      return;
+    }
+    tapTimer.current = setTimeout(() => { tapTimer.current = null; setPaused((p) => !p); }, 260);
+  }
+
+  // Barra de progreso: tocar o arrastrar para moverse en el episodio.
+  function scrubAt(e: React.PointerEvent<HTMLDivElement>) {
+    const r = e.currentTarget.getBoundingClientRect();
+    return Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+  }
+  function scrubEnd(frac: number) {
+    const v = video.current;
+    if (v?.duration) { v.currentTime = frac * v.duration; setProgress(frac * 100); }
+    setScrub(null);
+  }
+  const clock = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
 
   function onWheel(e: React.WheelEvent) {
     if (modal || Math.abs(e.deltaY) < 30 || Date.now() - wheelLock.current < 700) return;
@@ -216,7 +260,7 @@ export default function Player({
               playsInline
               autoPlay
               muted={muted}
-              onClick={() => setPaused((p) => !p)}
+              onClick={onVideoTap}
               onTimeUpdate={(e) => {
                 const v = e.currentTarget;
                 if (v.duration) setProgress((v.currentTime / v.duration) * 100);
@@ -237,7 +281,19 @@ export default function Player({
               onClick={() => { setMuted(false); if (video.current) video.current.muted = false; }}>🔇 Toca para activar el sonido</button>
           )}
           <div className="vinfo"><b>{series.title}</b><span>{episode?.title && episode.title !== `Episodio ${cur}` ? episode.title : series.synopsis}</span></div>
-          <div className="vbar"><i style={{ width: `${progress}%` }} /></div>
+          {skipFx && <span key={`${skipFx.dir}${skipFx.n}`} className={`skipfx ${skipFx.dir > 0 ? "fwd" : "back"}`}>{skipFx.dir > 0 ? "»" : "«"} {skipFx.n * 5} s</span>}
+          <div
+            className={`vbar seek${scrub !== null ? " on" : ""}`}
+            role="slider" aria-label="Progreso del episodio" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress)}
+            onPointerDown={(e) => { if (!info?.videoUrl) return; e.stopPropagation(); e.currentTarget.setPointerCapture(e.pointerId); setScrub(scrubAt(e)); }}
+            onPointerMove={(e) => { if (scrub !== null) setScrub(scrubAt(e)); }}
+            onPointerUp={(e) => { if (scrub !== null) scrubEnd(scrubAt(e)); }}
+            onPointerCancel={() => setScrub(null)}
+            onTouchStart={(e) => e.stopPropagation()} onTouchEnd={(e) => e.stopPropagation()}
+          >
+            <div className="track"><i style={{ width: `${scrub !== null ? scrub * 100 : progress}%` }} /><b style={{ left: `${scrub !== null ? scrub * 100 : progress}%` }} /></div>
+            {scrub !== null && video.current?.duration ? <span className="scrubtime">{clock(scrub * video.current.duration)} / {clock(video.current.duration)}</span> : null}
+          </div>
           <button className="epbar" onClick={() => { setSideTab("eps"); setSideOpen(true); }}>
             <span><List className="" /> Episodios 1–{total} · <b style={{ color: "var(--cyan)" }}>{subscribed ? "todo desbloqueado" : `${free} gratis`}</b></span>
             <Up />
