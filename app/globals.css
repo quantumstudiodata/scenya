@@ -363,6 +363,9 @@ a.astat.link:hover{border-color:var(--cyan)}
 .timeline .seg{position:absolute;top:0;bottom:0;background:rgba(124,92,255,.35);display:grid;place-items:center;border-right:1px solid var(--ink)}
 .timeline .seg.alt{background:rgba(53,224,255,.25)}
 .timeline .seg small{font-size:11px;font-weight:700;pointer-events:none}
+.timeline .seg.off{background:repeating-linear-gradient(45deg,rgba(255,107,138,.18) 0 6px,transparent 6px 12px)}
+.timeline .trimmed{position:absolute;top:0;bottom:0;background:rgba(4,0,24,.75);pointer-events:none}
+.ep-row.skipped{opacity:.55}
 .timeline .cut{position:absolute;top:0;bottom:0;width:2px;margin-left:-1px;background:var(--pink)}
 .timeline .head-pos{position:absolute;top:0;bottom:0;width:2px;margin-left:-1px;background:var(--lav);box-shadow:0 0 8px var(--lav)}
 .split-tools{align-items:center}

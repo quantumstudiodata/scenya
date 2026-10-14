@@ -8,6 +8,11 @@ import type { FFmpeg } from "@ffmpeg/ffmpeg";
 // solo se suben los episodios ya cortados. El worker de ffmpeg se sirve desde
 // public/ffmpeg (copiado de @ffmpeg/ffmpeg) porque webpack rompe su carga dinámica.
 const CORE = "https://unpkg.com/@ffmpeg/core@0.12.10/dist/esm";
+// Límite por archivo de Supabase (plan gratis: 50 MB). Si un episodio pasa
+// de LIMIT se vuelve a comprimir para que quepa en TARGET.
+const MB = 1048576;
+const LIMIT = 48 * MB;
+const TARGET = 44 * MB;
 
 const fmt = (s: number) => {
   const m = Math.floor(s / 60), sec = s - m * 60;
@@ -26,7 +31,9 @@ export default function VideoSplitter({ startNumber, onUpload, onClose }: Props)
   const [duration, setDuration] = useState(0);
   const [t, setT] = useState(0);
   const [cuts, setCuts] = useState<number[]>([]);
-  const [titles, setTitles] = useState<Record<number, string>>({});
+  const [titles, setTitles] = useState<Record<string, string>>({});
+  const [trim, setTrim] = useState<{ in: number; out: number | null }>({ in: 0, out: null });
+  const [skip, setSkip] = useState<number[]>([]);
   const [first, setFirst] = useState(startNumber);
   const [every, setEvery] = useState(60);
   const [exact, setExact] = useState(false);
@@ -39,13 +46,20 @@ export default function VideoSplitter({ startNumber, onUpload, onClose }: Props)
   useEffect(() => () => { if (url) URL.revokeObjectURL(url); }, [url]);
   useEffect(() => () => ff.current?.terminate(), []);
 
-  const bounds = useMemo(() => [0, ...cuts, duration], [cuts, duration]);
-  const segments = bounds.slice(0, -1).map((start, i) => ({ start, end: bounds[i + 1], number: first + i }));
+  // Piezas entre los cortes, dentro del recorte; las descartadas no se numeran ni se suben.
+  const outPt = trim.out ?? duration;
+  const bounds = useMemo(() => [trim.in, ...cuts.filter((c) => c > trim.in && c < outPt), outPt], [cuts, trim.in, outPt]);
+  let n = first;
+  const pieces = bounds.slice(0, -1).map((start, i) => {
+    const skipped = skip.includes(start);
+    return { start, end: bounds[i + 1], skipped, number: skipped ? 0 : n++ };
+  });
+  const segments = pieces.filter((p) => !p.skipped);
 
   function pick(f: File | undefined) {
     if (!f) return;
     if (url) URL.revokeObjectURL(url);
-    setFile(f); setUrl(URL.createObjectURL(f)); setCuts([]); setTitles({}); setError(""); setDone(0);
+    setFile(f); setUrl(URL.createObjectURL(f)); setCuts([]); setTitles({}); setTrim({ in: 0, out: null }); setSkip([]); setError(""); setDone(0);
   }
 
   function seek(s: number) {
@@ -60,16 +74,33 @@ export default function VideoSplitter({ startNumber, onUpload, onClose }: Props)
   }
 
   function autoSplit() {
-    const n = Math.max(5, every);
+    const step = Math.max(5, every);
     const list: number[] = [];
-    for (let s = n; s < duration - 1; s += n) list.push(s);
-    setCuts(list);
+    for (let s = trim.in + step; s < outPt - 1; s += step) list.push(Math.round(s * 10) / 10);
+    setCuts(list); setSkip([]);
+  }
+
+  // Recorte del video original: lo de antes del inicio y después del fin no se usa.
+  function markIn(at = video.current?.currentTime ?? t) {
+    if (at >= outPt - 1) return;
+    setTrim((x) => ({ ...x, in: Math.round(at * 10) / 10 }));
+  }
+  function markOut(at = video.current?.currentTime ?? t) {
+    if (at <= trim.in + 1) return;
+    setTrim((x) => ({ ...x, out: Math.round(at * 10) / 10 }));
+  }
+
+  function removeCut(at: number) {
+    setCuts((c) => c.filter((x) => x !== at));
+    setSkip((k) => k.filter((x) => x !== at));
   }
 
   useEffect(() => {
     function key(e: KeyboardEvent) {
       if (!file || busy || (e.target as HTMLElement).closest("input, textarea, select")) return;
       if (e.key === "c" || e.key === "C") { e.preventDefault(); addCut(); }
+      if (e.key === "i" || e.key === "I") { e.preventDefault(); markIn(); }
+      if (e.key === "o" || e.key === "O") { e.preventDefault(); markOut(); }
       if (e.key === "ArrowLeft") { e.preventDefault(); seek((video.current?.currentTime ?? 0) - (e.shiftKey ? 1 : 0.1)); }
       if (e.key === "ArrowRight") { e.preventDefault(); seek((video.current?.currentTime ?? 0) + (e.shiftKey ? 1 : 0.1)); }
     }
@@ -117,11 +148,34 @@ export default function VideoSplitter({ startNumber, onUpload, onClose }: Props)
           ]);
           f.off("progress", onProgress);
           if (code !== 0) throw new Error(`No se pudo cortar el ${label}. Prueba con "Corte exacto".`);
-          const data = (await f.readFile("out.mp4")) as Uint8Array;
+          let data = (await f.readFile("out.mp4")) as Uint8Array;
           await f.deleteFile("out.mp4");
+          if (data.byteLength > LIMIT) {
+            // Demasiado pesado para el almacenamiento: se comprime a 720p con la tasa justa.
+            const secs = s.end - s.start;
+            const kbps = Math.max(400, Math.floor((TARGET * 8) / secs / 1000) - 128);
+            const big = (data.byteLength / MB).toFixed(0);
+            const onZip = ({ progress }: { progress: number }) =>
+              setBusy(`Comprimiendo ${label} (pesaba ${big} MB)… ${Math.round(Math.min(1, Math.max(0, progress)) * 100)}%`);
+            setBusy(`Comprimiendo ${label} (pesaba ${big} MB)…`);
+            await f.writeFile("big.mp4", data);
+            f.on("progress", onZip);
+            const zip = await f.exec([
+              "-i", "big.mp4", "-map", "0:v:0", "-map", "0:a:0?",
+              "-vf", "scale='if(gt(iw,ih),min(1280,iw),-2)':'if(gt(iw,ih),-2,min(1280,ih))'",
+              "-c:v", "libx264", "-preset", "veryfast", "-b:v", `${kbps}k`, "-maxrate", `${kbps}k`, "-bufsize", `${kbps * 2}k`,
+              "-c:a", "aac", "-b:a", "128k", "-movflags", "+faststart", "small.mp4",
+            ]);
+            f.off("progress", onZip);
+            await f.deleteFile("big.mp4");
+            if (zip !== 0) throw new Error(`No se pudo comprimir el ${label}.`);
+            data = (await f.readFile("small.mp4")) as Uint8Array;
+            await f.deleteFile("small.mp4");
+            if (data.byteLength > 50 * MB) throw new Error(`El ${label} sigue pesando más de 50 MB. Córtalo en partes más cortas.`);
+          }
           const ep = new File([data as BlobPart], `episodio-${s.number}.mp4`, { type: "video/mp4" });
-          setBusy(`Subiendo ${label} · ${(ep.size / 1048576).toFixed(1)} MB…`);
-          await onUpload(s.number, titles[s.number]?.trim() || `Episodio ${s.number}`, ep);
+          setBusy(`Subiendo ${label} · ${(ep.size / MB).toFixed(1)} MB…`);
+          await onUpload(s.number, titles[s.start]?.trim() || `Episodio ${s.number}`, ep);
           setDone(i + 1);
         }
       } finally {
@@ -168,12 +222,14 @@ export default function VideoSplitter({ startNumber, onUpload, onClose }: Props)
               className="timeline" role="slider" aria-label="Línea de tiempo" aria-valuemin={0} aria-valuemax={duration} aria-valuenow={t} tabIndex={0}
               onClick={(e) => { const r = e.currentTarget.getBoundingClientRect(); seek(((e.clientX - r.left) / r.width) * duration); }}
             >
-              {duration > 0 && segments.map((s, i) => (
-                <span key={i} className={`seg ${i % 2 ? "alt" : ""}`} style={{ left: `${(s.start / duration) * 100}%`, width: `${((s.end - s.start) / duration) * 100}%` }}>
-                  <small>{s.number}</small>
+              {duration > 0 && pieces.map((s, i) => (
+                <span key={s.start} className={`seg ${i % 2 ? "alt" : ""} ${s.skipped ? "off" : ""}`} style={{ left: `${(s.start / duration) * 100}%`, width: `${((s.end - s.start) / duration) * 100}%` }}>
+                  <small>{s.skipped ? "✕" : s.number}</small>
                 </span>
               ))}
-              {duration > 0 && cuts.map((c) => <i key={c} className="cut" style={{ left: `${(c / duration) * 100}%` }} />)}
+              {duration > 0 && trim.in > 0 && <span className="trimmed" style={{ left: 0, width: `${(trim.in / duration) * 100}%` }} />}
+              {duration > 0 && outPt < duration && <span className="trimmed" style={{ left: `${(outPt / duration) * 100}%`, right: 0 }} />}
+              {duration > 0 && cuts.filter((c) => c > trim.in && c < outPt).map((c) => <i key={c} className="cut" style={{ left: `${(c / duration) * 100}%` }} />)}
               {duration > 0 && <i className="head-pos" style={{ left: `${(t / duration) * 100}%` }} />}
             </div>
 
@@ -187,29 +243,46 @@ export default function VideoSplitter({ startNumber, onUpload, onClose }: Props)
             </div>
 
             <div className="acts split-tools">
+              <span className="muted" style={{ fontSize: 13 }}>Recortar el video:</span>
+              <button className="btn soft small" onClick={() => markIn()} disabled={!!busy}>⟦ Inicio aquí <kbd>I</kbd></button>
+              <button className="btn soft small" onClick={() => markOut()} disabled={!!busy}>Fin aquí ⟧ <kbd>O</kbd></button>
+              {(trim.in > 0 || trim.out !== null) && (
+                <>
+                  <span className="tcode">{fmt(trim.in)} → {fmt(outPt)}</span>
+                  <button className="btn soft small danger" onClick={() => setTrim({ in: 0, out: null })} disabled={!!busy}>Quitar recorte</button>
+                </>
+              )}
+            </div>
+
+            <div className="acts split-tools">
               <label className="inline">Dividir cada
                 <input type="number" min={5} value={every} onChange={(e) => setEvery(Number(e.target.value))} /> s
               </label>
               <button className="btn soft small" onClick={autoSplit} disabled={!!busy || !duration}>Aplicar</button>
-              {cuts.length > 0 && <button className="btn soft small danger" onClick={() => setCuts([])} disabled={!!busy}>Quitar cortes</button>}
+              {cuts.length > 0 && <button className="btn soft small danger" onClick={() => { setCuts([]); setSkip([]); }} disabled={!!busy}>Quitar cortes</button>}
               <label className="inline">Empezar en episodio
                 <input type="number" min={1} value={first} onChange={(e) => setFirst(Math.max(1, Number(e.target.value) || 1))} />
               </label>
             </div>
 
             <div className="alist split-list">
-              {segments.map((s, i) => (
-                <div key={s.number} className="arow ep-row">
-                  <b className="epn">{s.number}</b>
-                  <input
-                    aria-label={`Título del episodio ${s.number}`} placeholder={`Episodio ${s.number}`}
-                    value={titles[s.number] ?? ""} onChange={(e) => setTitles((x) => ({ ...x, [s.number]: e.target.value }))}
-                  />
+              {pieces.map((s, i) => (
+                <div key={s.start} className={`arow ep-row${s.skipped ? " skipped" : ""}`}>
+                  <b className="epn">{s.skipped ? "✕" : s.number}</b>
+                  {s.skipped ? <span className="muted" style={{ flex: 1 }}>Descartado: no se sube</span> : (
+                    <input
+                      aria-label={`Título del episodio ${s.number}`} placeholder={`Episodio ${s.number}`}
+                      value={titles[s.start] ?? ""} onChange={(e) => setTitles((x) => ({ ...x, [s.start]: e.target.value }))}
+                    />
+                  )}
                   <button className="btn soft small" onClick={() => { seek(s.start); video.current?.play(); }}>
                     {fmt(s.start)} – {fmt(s.end)} ▶
                   </button>
+                  <button className="btn soft small" onClick={() => setSkip((k) => (s.skipped ? k.filter((x) => x !== s.start) : [...k, s.start]))} disabled={!!busy}>
+                    {s.skipped ? "Recuperar" : "Descartar"}
+                  </button>
                   {i > 0 && (
-                    <button className="btn soft small danger" aria-label={`Quitar el corte antes del episodio ${s.number}`} onClick={() => setCuts((c) => c.filter((x) => x !== s.start))} disabled={!!busy}>
+                    <button className="btn soft small danger" aria-label={`Quitar el corte en ${fmt(s.start)}`} onClick={() => removeCut(s.start)} disabled={!!busy}>
                       Unir con anterior
                     </button>
                   )}
@@ -225,14 +298,14 @@ export default function VideoSplitter({ startNumber, onUpload, onClose }: Props)
             {(busy || error) && <p className={`msg${error && !busy ? " err" : ""}`}>{busy || error}</p>}
 
             <div className="acts">
-              <button className="btn primary" onClick={generate} disabled={!!busy || !duration}>
+              <button className="btn primary" onClick={generate} disabled={!!busy || !duration || !segments.length}>
                 Generar y subir {segments.length} episodio{segments.length === 1 ? "" : "s"}
               </button>
               <label className="btn soft" htmlFor="full-video2">Cambiar video</label>
               <input id="full-video2" type="file" accept="video/*" hidden onChange={(e) => pick(e.target.files?.[0])} disabled={!!busy} />
             </div>
             <p className="muted" style={{ fontSize: 12 }}>
-              Coloca la reproducción donde termina cada episodio y presiona <b>C</b>. Flechas ← → mueven 0.1 s (con Shift, 1 s). Si un número de episodio ya existe, su video se reemplaza.
+              Coloca la reproducción donde termina cada episodio y presiona <b>C</b>. <b>I</b> y <b>O</b> marcan dónde empieza y termina lo que se usa del video. "Descartar" quita una parte (tomas falsas, créditos). Si un episodio pesa más de 48 MB se comprime solo. Flechas ← → mueven 0.1 s (con Shift, 1 s). Si un número de episodio ya existe, su video se reemplaza.
             </p>
           </>
         )}
