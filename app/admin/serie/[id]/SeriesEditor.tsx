@@ -1,12 +1,12 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/browser";
+import { upload, saveEpisodeApi } from "@/lib/admin-upload";
 import { slugify } from "@/lib/slug";
 import { preparePoster } from "@/lib/poster-image";
-import VideoSplitter from "./VideoSplitter";
+import EpisodeEditor from "./EpisodeEditor";
 
 export type AdminSeries = {
   id: string; slug: string; title: string; genre: string; synopsis: string;
@@ -16,19 +16,6 @@ export type AdminEpisode = { id: string; number: number; title: string; hasVideo
 
 const GENRES = ["Romance", "Drama", "Venganza", "CEO", "Suspenso", "Fantasía", "Familia", "Comedia"];
 
-// Sube un archivo directo al almacenamiento de Supabase con un enlace firmado.
-async function upload(kind: "poster" | "video", file: File) {
-  const ext = file.name.split(".").pop() ?? (kind === "video" ? "mp4" : "jpg");
-  const r = await fetch("/api/admin/upload", {
-    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ kind, ext }),
-  });
-  const d = await r.json();
-  if (!r.ok) throw new Error(d.error ?? "No se pudo preparar la subida.");
-  const { error } = await createClient().storage.from(d.bucket).uploadToSignedUrl(d.path, d.token, file, { contentType: file.type });
-  if (error) throw new Error(error.message.includes("size") ? "El archivo es demasiado grande." : "No se pudo subir el archivo.");
-  return { path: d.path as string, publicUrl: d.publicUrl as string | null };
-}
-
 export default function SeriesEditor({ series, episodes: initial }: { series: AdminSeries | null; episodes: AdminEpisode[] }) {
   const router = useRouter();
   const [form, setForm] = useState({
@@ -37,6 +24,7 @@ export default function SeriesEditor({ series, episodes: initial }: { series: Ad
     is_featured: series?.is_featured ?? false, poster_url: series?.poster_url ?? null as string | null,
   });
   const [episodes, setEpisodes] = useState(initial);
+  useEffect(() => setEpisodes(initial), [initial]);
   const [msg, setMsg] = useState<{ text: string; err?: boolean } | null>(null);
   const [busy, setBusy] = useState("");
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -75,12 +63,7 @@ export default function SeriesEditor({ series, episodes: initial }: { series: Ad
     if (!series) return;
     let videoPath: string | undefined;
     if (file) videoPath = (await upload("video", file)).path;
-    const r = await fetch("/api/admin/episodes", {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ seriesId: series.id, number, title, videoPath }),
-    });
-    const d = await r.json().catch(() => ({}));
-    if (!r.ok) throw new Error(d.error ?? "No se pudo guardar el episodio.");
+    const d = { episode: await saveEpisodeApi({ seriesId: series.id, number, title, videoPath }) };
     setEpisodes((list) => {
       const rest = list.filter((e) => e.number !== number);
       const prev = list.find((e) => e.number === number);
@@ -192,7 +175,7 @@ export default function SeriesEditor({ series, episodes: initial }: { series: Ad
           <div className="head">
             <h2>Episodios ({episodes.length})</h2>
             <div className="acts">
-              <button className="btn soft" onClick={() => setSplitter(true)} disabled={!!busy}>✂ Cortar video completo</button>
+              <button className="btn soft" onClick={() => setSplitter(true)} disabled={!!busy}>✂ Editor de episodios</button>
               <label className="btn primary" htmlFor="bulk-videos">+ Agregar videos</label>
             </div>
             <input ref={bulk} id="bulk-videos" type="file" accept="video/*" multiple hidden onChange={(e) => addVideos(e.target.files)} />
@@ -201,10 +184,11 @@ export default function SeriesEditor({ series, episodes: initial }: { series: Ad
             Puedes elegir varios videos a la vez; se numeran en orden por nombre de archivo (ep01.mp4, ep02.mp4…). Máximo 50 MB por video en el plan gratis de Supabase.
           </p>
           {splitter && (
-            <VideoSplitter
-              startNumber={Math.max(0, ...episodes.map((e) => e.number)) + 1}
-              onUpload={(n, title, file) => saveEpisode(n, title, file)}
-              onClose={(changed) => { setSplitter(false); if (changed) { say("Episodios generados y subidos."); router.refresh(); } }}
+            <EpisodeEditor
+              seriesId={series.id}
+              episodes={episodes}
+              onChanged={() => router.refresh()}
+              onClose={(changed) => { setSplitter(false); if (changed) { say("Episodios actualizados."); router.refresh(); } }}
             />
           )}
           {episodes.length === 0 ? <p className="muted">Sin episodios todavía.</p> : (
